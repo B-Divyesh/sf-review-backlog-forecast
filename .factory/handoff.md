@@ -1,5 +1,17 @@
 # Handoff — Review Backlog Forecast v1
 
+## Independent verification status: **FAIL — do not release**
+
+**Candidate tested:** `81a9dbbb50ef59f3e8dd8f215ad6733af32f97c8`
+**Required URL:** `https://review-backlog-forecast.sociobot.in/`
+**Verified:** 2026-08-27 UTC
+
+The clean local candidate builds and its unit/browser checks pass, but the required production URL is not usable: Chromium reports `ERR_CERT_COMMON_NAME_INVALID`; normal curl rejects the certificate; and an insecure diagnostic request to `/` receives Azure `404 Site Not Found`, not the app. The deployment does not establish a match to the candidate and cannot be released.
+
+Additional medium-severity accessibility defect: the two mobile help (`?`) buttons measure 30 × 30 CSS px, below the required 44 × 44 px touch target.
+
+See `.factory/verification.md` for exact commands, local behavioral evidence (including offline reload and service-worker update), bundle/Lighthouse results, privacy/outbound-request checks, and all remediation steps. This verifier status supersedes the builder-reported verification notes below.
+
 ## What shipped
 
 - A complete import-and-preview recovery planner with **Steady**, **Deadline**, and **Gentle** policies.
@@ -23,7 +35,7 @@ npm run test:e2e
 
 The deploy command is exactly `npm run build`. It produces `dist/index.html`, `dist/privacy/index.html`, and `dist/terms/index.html`.
 
-Final verification on 2026-08-27:
+Builder-reported verification on 2026-08-27 (superseded by the independent FAIL above):
 
 - `npm test`: 11/11 unit tests passed.
 - `npm run build`: passed; initial app JavaScript 18.21 KB raw / 7.22 KB gzip, CSS 21.56 KB raw / 5.36 KB gzip.
