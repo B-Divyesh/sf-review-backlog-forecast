@@ -50,9 +50,10 @@ The exact deploy command is `npm run build`; static output lands in `dist/` with
 ```sh
 npm test
 npm run build
+npm run test:e2e
 ```
 
-Unit tests cover policy distinction, the session cap, due-today priority, rollover visibility, validation, and both CSV import shapes. The handoff records browser, offline, accessibility, and performance verification.
+Unit tests cover policy distinction, the session cap, due-today priority, rollover visibility, validation, and both CSV import shapes. Playwright tests cover the real forecast path on desktop/mobile, CSV import, local persistence, offline reopening, 390px overflow, and Axe accessibility. The handoff records performance verification.
 
 ## Privacy and architecture
 

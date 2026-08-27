@@ -49,6 +49,14 @@ function sessionsWithin(days: number, studyDays: number): number {
   return Math.max(1, sessions);
 }
 
+function sessionsBetween(startDay: number, endDay: number, studyDays: number): number {
+  let sessions = 0;
+  for (let index = startDay; index < endDay; index += 1) {
+    if (index % 7 < studyDays) sessions += 1;
+  }
+  return Math.max(1, sessions);
+}
+
 function lastStudyDay(days: ForecastDay[]): ForecastDay | undefined {
   for (let index = days.length - 1; index >= 0; index -= 1) {
     if (days[index].studyDay) return days[index];
@@ -69,8 +77,7 @@ function overdueTarget(
     const ramp = studySessionIndex <= 2 ? 0.5 : studySessionIndex <= 5 ? 0.75 : 1;
     return Math.min(remaining, Math.max(1, Math.ceil(steadyAllowance * ramp)));
   }
-  const daysLeft = Math.max(1, input.deadlineDays - dayIndex);
-  const sessionsLeft = sessionsWithin(daysLeft, input.studyDays);
+  const sessionsLeft = sessionsBetween(dayIndex, input.deadlineDays, input.studyDays);
   return Math.min(remaining, Math.ceil(remaining / sessionsLeft));
 }
 
@@ -81,7 +88,10 @@ export function simulatePolicy(input: ForecastInput, policy: PolicyId, start = n
   const capacity = Math.max(1, Math.floor((input.capMinutes * 60) / input.secondsPerCard));
   const steadySessions = sessionsWithin(14, input.studyDays);
   const steadyAllowance = input.overdue === 0 ? 0 : Math.max(1, Math.ceil(input.overdue / steadySessions));
-  const horizon = Math.max(28, input.deadlineDays + 14, 42);
+  const typicalSpare = Math.max(0, capacity - input.dailyDue - input.newCards);
+  const expectedSessions = typicalSpare > 0 ? Math.ceil(input.overdue / typicalSpare) : 730;
+  const expectedCalendarDays = Math.ceil((expectedSessions / input.studyDays) * 7) + 14;
+  const horizon = Math.max(42, input.deadlineDays + 14, Math.min(730, expectedCalendarDays));
   let overdueRemaining = input.overdue;
   let regularPending = 0;
   let sessionIndex = 0;
@@ -112,7 +122,7 @@ export function simulatePolicy(input: ForecastInput, policy: PolicyId, start = n
     const totalReviewed = regularReviewed + overdueReviewed;
     days.push({
       index: index + 1,
-      date: date.toISOString().slice(0, 10),
+      date: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`,
       studyDay,
       regularAdded,
       regularReviewed,

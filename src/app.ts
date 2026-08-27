@@ -53,7 +53,10 @@ function download(name: string, contents: string, type: string): void {
 
 function readInput(): ForecastInput {
   const data = new FormData(form);
-  const numeric = (name: string) => Number(data.get(name));
+  const numeric = (name: string) => {
+    const raw = data.get(name);
+    return raw === null || raw === "" ? Number.NaN : Number(raw);
+  };
   return {
     overdue: numeric("overdue"),
     dueToday: numeric("dueToday"),
@@ -146,7 +149,8 @@ function renderDetail(): void {
     </div>`;
   }).join("");
 
-  const ledgerEnd = Math.min(forecast.days.length, Math.max(21, forecast.finishDay ?? 28));
+  const ledgerEnd = Math.min(forecast.days.length, Math.max(21, Math.min(60, forecast.finishDay ?? 28)));
+  $("#ledger-range").textContent = `${ledgerEnd < (forecast.finishDay ?? ledgerEnd) ? `first ${ledgerEnd} days · ` : ""}regular + overdue = session total`;
   $("#schedule-body").innerHTML = forecast.days.slice(0, ledgerEnd).map((day) => `<tr class="${day.studyDay ? "" : "rest-row"}">
     <th scope="row"><span>${formatDay(day)}</span><small>Day ${day.index}${day.studyDay ? "" : " · Rest"}</small></th>
     <td>${day.regularReviewed}${day.regularRollover ? `<small>+${day.regularRollover} waiting</small>` : ""}</td>
@@ -184,9 +188,11 @@ async function updateSavedStrip(): Promise<void> {
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
+  form.classList.add("was-validated");
   const input = readInput();
   const errors = validateInput(input);
   if (errors.length > 0) return showErrors(errors);
+  form.classList.remove("was-validated");
   renderForecast(input);
   storage.saveInput(input).catch(() => announce("The forecast works, but this browser could not save your inputs."));
 });
@@ -212,7 +218,12 @@ queueFile.addEventListener("change", async () => {
       if (!backup.input || validateInput(backup.input).length > 0) throw new Error("This JSON backup does not contain valid forecast inputs.");
       populateForm(backup.input);
       await storage.saveInput(backup.input);
-      if (backup.plan) await storage.savePlan(backup.plan);
+      if (backup.plan) {
+        if (!["steady", "deadline", "gentle"].includes(backup.plan.policy) || validateInput(backup.plan.input).length > 0 || !Number.isFinite(Date.parse(backup.plan.savedAt))) {
+          throw new Error("The saved plan in this JSON backup is invalid.");
+        }
+        await storage.savePlan(backup.plan);
+      }
       await updateSavedStrip();
       importMessage.textContent = "Local backup restored. Run the forecast to review it.";
     } else {
@@ -316,6 +327,7 @@ updateConnection();
 
 async function registerServiceWorker(): Promise<void> {
   if (!("serviceWorker" in navigator)) return;
+  const wasControlled = Boolean(navigator.serviceWorker.controller);
   const registration = await navigator.serviceWorker.register("/sw.js");
   const showUpdate = (worker: ServiceWorker) => announce("A new version is ready.", {
     label: "Update",
@@ -328,7 +340,7 @@ async function registerServiceWorker(): Promise<void> {
       if (worker.state === "installed" && navigator.serviceWorker.controller) showUpdate(worker);
     });
   });
-  navigator.serviceWorker.addEventListener("controllerchange", () => window.location.reload());
+  if (wasControlled) navigator.serviceWorker.addEventListener("controllerchange", () => window.location.reload(), { once: true });
 }
 
 async function init(): Promise<void> {

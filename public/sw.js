@@ -1,4 +1,4 @@
-const VERSION = "rbf-v1.0.0";
+const VERSION = "rbf-v1.0.1";
 const SHELL_CACHE = `${VERSION}-shell`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 const SHELL = [
@@ -7,6 +7,9 @@ const SHELL = [
   "/offline.html",
   "/privacy/",
   "/terms/",
+  "/assets/app.js",
+  "/assets/app.css",
+  "/assets/legal.css",
   "/manifest.webmanifest",
   "/icons/icon.svg",
   "/icons/icon-192.png",
@@ -51,13 +54,13 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  event.respondWith(
-    caches.match(request).then((cached) => cached || fetch(request).then((response) => {
-      if (response.ok) {
-        const copy = response.clone();
-        caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, copy));
-      }
-      return response;
-    }))
-  );
+  event.respondWith((async () => {
+    const shell = await caches.open(SHELL_CACHE);
+    const runtime = await caches.open(RUNTIME_CACHE);
+    const cached = await shell.match(url.pathname) || await runtime.match(request);
+    if (cached) return cached;
+    const response = await fetch(request);
+    if (response.ok) await runtime.put(request, response.clone());
+    return response;
+  })());
 });

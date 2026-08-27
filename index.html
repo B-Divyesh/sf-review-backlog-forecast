@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#173f3a">
     <meta name="description" content="Preview a humane, capped recovery plan for an Anki review backlog—without changing your collection.">
     <meta name="color-scheme" content="light">
+    <link rel="canonical" href="https://review-backlog-forecast.sociobot.in/">
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
@@ -167,8 +168,8 @@
           </figure>
 
           <details class="schedule-details" open>
-            <summary>Daily ledger <span>regular + overdue = session total</span></summary>
-            <div class="table-wrap">
+            <summary>Daily ledger <span id="ledger-range">regular + overdue = session total</span></summary>
+            <div class="table-wrap" tabindex="0" aria-label="Daily ledger; scroll horizontally to see every column">
               <table>
                 <thead><tr><th scope="col">Day</th><th scope="col">Regular</th><th scope="col">Overdue</th><th scope="col">Total</th><th scope="col">Minutes</th><th scope="col">Queue left</th></tr></thead>
                 <tbody id="schedule-body"></tbody>
@@ -217,7 +218,7 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite" hidden>
       <span id="toast-message"></span>
-      <button class="text-button" id="toast-action" type="button" hidden></button>
+      <button class="text-button" id="toast-action" type="button" hidden>Update</button>
     </div>
     <div class="tooltip" id="tooltip" role="tooltip" hidden></div>
     <script type="module" src="/src/app.ts"></script>

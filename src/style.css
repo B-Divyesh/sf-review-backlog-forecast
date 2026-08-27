@@ -242,7 +242,7 @@ main { display: block; }
 
 .hero-instrument figcaption {
   padding: 12px 4px 0;
-  color: var(--muted);
+  color: var(--ink);
   font-family: var(--display);
   font-size: 0.76rem;
   letter-spacing: 0.04em;
@@ -451,7 +451,7 @@ main { display: block; }
 }
 
 .number-input input:focus { border-color: #e8bd61; outline: 0; }
-.number-input input:invalid:not(:placeholder-shown) { border-color: #ff9682; }
+.was-validated .number-input input:invalid { border-color: #ff9682; }
 .number-input small { color: rgb(255 248 232 / 58%); font-family: var(--display); font-size: 0.7rem; white-space: nowrap; }
 
 .form-submit {
