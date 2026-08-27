@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#173f3a">
+    <meta name="description" content="Preview a humane, capped recovery plan for an Anki review backlog—without changing your collection.">
+    <meta name="color-scheme" content="light">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <title>Review Backlog Forecast — Preview a humane recovery plan</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to forecast controls</a>
+    <header class="site-header">
+      <a class="wordmark" href="/" aria-label="Review Backlog Forecast home">
+        <span class="wordmark-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>Review backlog<br><b>forecast</b></span>
+      </a>
+      <div class="header-tools">
+        <span class="connection" id="connection-status"><span aria-hidden="true"></span> Ready offline</span>
+        <a href="#guide">How it works</a>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <p class="eyebrow">A recovery console for spaced repetition</p>
+          <h1 id="page-title">See the climb before you touch the queue.</h1>
+          <p class="lede">Turn an overdue pile into a day-by-day plan that protects today’s cards and never schedules beyond your session cap.</p>
+          <ul class="trust-list" aria-label="Product promises">
+            <li>Preview only</li>
+            <li>Stays on this device</li>
+            <li>No Anki access</li>
+          </ul>
+        </div>
+        <figure class="hero-instrument">
+          <picture>
+            <source media="(max-width: 720px)" srcset="/assets/recovery-console-720.webp" type="image/webp">
+            <img src="/assets/recovery-console-1200.webp" srcset="/assets/recovery-console-720.webp 720w, /assets/recovery-console-1200.webp 1200w" sizes="(max-width: 840px) 100vw, 52vw" width="1200" height="800" alt="A sea-green planning instrument with three paper tracks and a red forecast needle" decoding="async" fetchpriority="high">
+          </picture>
+          <figcaption>Three ways through the same queue. Nothing is rescheduled here.</figcaption>
+        </figure>
+      </section>
+
+      <section class="saved-strip" id="saved-strip" hidden aria-labelledby="saved-title">
+        <div>
+          <p class="eyebrow">Plan on this device</p>
+          <h2 id="saved-title">Your last chosen plan</h2>
+          <p id="saved-summary"></p>
+        </div>
+        <div class="saved-actions">
+          <button class="button button-quiet" id="open-saved" type="button">Open plan</button>
+          <button class="text-button danger-text" id="remove-saved" type="button">Remove</button>
+        </div>
+      </section>
+
+      <section class="planner" aria-labelledby="planner-title">
+        <div class="section-heading">
+          <p class="eyebrow">Set the dials</p>
+          <h2 id="planner-title">Describe your queue</h2>
+          <p>Use totals, or import a simple CSV. Estimates are clearly marked and adjustable.</p>
+        </div>
+
+        <div class="import-panel">
+          <div>
+            <span class="step-number" aria-hidden="true">01</span>
+            <h3>Bring the count</h3>
+            <p>Import card due dates or a one-row summary. The file is read in this browser and never uploaded.</p>
+          </div>
+          <div class="import-actions">
+            <label class="file-button" for="queue-file"><span>Import CSV or backup</span><small>.csv or this app’s .json</small></label>
+            <input class="visually-hidden" id="queue-file" type="file" accept=".csv,text/csv,.json,application/json">
+            <button class="text-button" id="download-template" type="button">Download CSV template</button>
+            <details>
+              <summary>Accepted CSV columns</summary>
+              <p><b>Summary:</b> <code>overdue,due_today,daily_due</code></p>
+              <p><b>Card rows:</b> <code>due_date</code> (YYYY-MM-DD) or <code>days_overdue</code>, plus optional <code>count</code>.</p>
+            </details>
+          </div>
+          <p class="import-message" id="import-message" role="status" aria-live="polite"></p>
+        </div>
+
+        <form id="forecast-form" novalidate>
+          <div class="form-intro">
+            <span class="step-number" aria-hidden="true">02</span>
+            <h3>Set your limits</h3>
+            <button class="text-button" id="load-example" type="button">Try an example</button>
+          </div>
+          <div class="error-summary" id="error-summary" role="alert" tabindex="-1" hidden></div>
+          <div class="dial-grid">
+            <label class="dial-field" for="overdue">
+              <span>Overdue now <button type="button" class="hint" data-hint="Cards with a due date before today." aria-label="About overdue cards">?</button></span>
+              <span class="number-input"><input id="overdue" name="overdue" type="number" min="0" max="100000" step="1" inputmode="numeric" required><small>cards</small></span>
+            </label>
+            <label class="dial-field" for="due-today">
+              <span>Due today <button type="button" class="hint" data-hint="These are protected before any overdue cards are added." aria-label="About cards due today">?</button></span>
+              <span class="number-input"><input id="due-today" name="dueToday" type="number" min="0" max="100000" step="1" inputmode="numeric" required><small>cards</small></span>
+            </label>
+            <label class="dial-field" for="daily-due">
+              <span>Usual daily due <em>estimate</em></span>
+              <span class="number-input"><input id="daily-due" name="dailyDue" type="number" min="0" max="100000" step="1" inputmode="numeric" required><small>/ day</small></span>
+            </label>
+            <label class="dial-field" for="new-cards">
+              <span>New cards <em>estimate</em></span>
+              <span class="number-input"><input id="new-cards" name="newCards" type="number" min="0" max="10000" step="1" inputmode="numeric" value="0" required><small>/ day</small></span>
+            </label>
+            <label class="dial-field" for="seconds-card">
+              <span>Time per review <em>estimate</em></span>
+              <span class="number-input"><input id="seconds-card" name="secondsPerCard" type="number" min="3" max="300" step="1" inputmode="numeric" value="12" required><small>seconds</small></span>
+            </label>
+            <label class="dial-field accent-dial" for="cap-minutes">
+              <span>Hard session cap</span>
+              <span class="number-input"><input id="cap-minutes" name="capMinutes" type="number" min="5" max="480" step="1" inputmode="numeric" value="30" required><small>minutes</small></span>
+            </label>
+            <label class="dial-field" for="deadline-days">
+              <span>Deadline plan target</span>
+              <span class="number-input"><input id="deadline-days" name="deadlineDays" type="number" min="2" max="90" step="1" inputmode="numeric" value="14" required><small>days</small></span>
+            </label>
+            <label class="dial-field" for="study-days">
+              <span>Study sessions</span>
+              <span class="number-input"><input id="study-days" name="studyDays" type="number" min="1" max="7" step="1" inputmode="numeric" value="7" required><small>/ 7 days</small></span>
+            </label>
+          </div>
+          <div class="form-submit">
+            <p><b>Safe by design:</b> this forecasts counts only. It cannot read or change your Anki collection.</p>
+            <button class="button button-primary" type="submit"><span>Run forecast</span><span aria-hidden="true">→</span></button>
+          </div>
+        </form>
+      </section>
+
+      <section class="results" id="results" aria-labelledby="results-title" hidden>
+        <div class="section-heading results-heading">
+          <div>
+            <p class="eyebrow">Compare the channels</p>
+            <h2 id="results-title">Three honest routes through the queue</h2>
+          </div>
+          <p id="capacity-readout" class="capacity-readout"></p>
+        </div>
+        <fieldset class="policy-fieldset">
+          <legend class="visually-hidden">Choose a recovery policy</legend>
+          <div class="policy-grid" id="policy-grid"></div>
+        </fieldset>
+
+        <article class="plan-detail" aria-labelledby="detail-title">
+          <header class="detail-header">
+            <div>
+              <p class="eyebrow">Selected channel</p>
+              <h2 id="detail-title"></h2>
+              <p id="detail-description"></p>
+            </div>
+            <div class="detail-actions">
+              <button class="button button-primary" id="save-plan" type="button">Use this plan</button>
+              <button class="button button-quiet" id="export-plan" type="button">Export schedule</button>
+            </div>
+          </header>
+
+          <div class="readout-grid" id="readout-grid"></div>
+          <div class="warning-note" id="plan-warning" hidden></div>
+
+          <figure class="forecast-plot" aria-labelledby="plot-caption">
+            <figcaption id="plot-caption">First 21 days: regular reviews and overdue recovery</figcaption>
+            <div class="plot-legend" aria-hidden="true"><span class="regular-key">Regular</span><span class="overdue-key">Overdue</span><span class="rest-key">Rest day</span></div>
+            <div class="plot" id="plot"></div>
+          </figure>
+
+          <details class="schedule-details" open>
+            <summary>Daily ledger <span>regular + overdue = session total</span></summary>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th scope="col">Day</th><th scope="col">Regular</th><th scope="col">Overdue</th><th scope="col">Total</th><th scope="col">Minutes</th><th scope="col">Queue left</th></tr></thead>
+                <tbody id="schedule-body"></tbody>
+              </table>
+            </div>
+          </details>
+
+          <div class="assumptions" id="guide">
+            <div>
+              <p class="eyebrow">Read the fine print</p>
+              <h3>What moves cards in this forecast</h3>
+            </div>
+            <ol>
+              <li><b>Today stays in the plan.</b> Due-today and estimated normal reviews get capacity before overdue cards.</li>
+              <li><b>One pace for every card.</b> Minutes are card count × your seconds-per-review estimate.</li>
+              <li><b>Rest days add regular work.</b> Unreviewed normal cards roll forward and stay visible.</li>
+              <li><b>Anki scheduling is not simulated.</b> Future intervals, retention, lapses, and FSRS changes remain unknown.</li>
+            </ol>
+          </div>
+        </article>
+      </section>
+
+      <section class="empty-state" id="empty-state" aria-labelledby="empty-title">
+        <span class="empty-dial" aria-hidden="true"></span>
+        <div>
+          <p class="eyebrow">Forecast tape is blank</p>
+          <h2 id="empty-title">Add your queue totals to compare plans.</h2>
+          <p>You can change every assumption and rerun as often as you need. No card is ever moved.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-brand">
+        <span class="wordmark-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <p><b>Review Backlog Forecast</b><br>A free, local-first planning utility.</p>
+      </div>
+      <nav aria-label="Footer">
+        <a href="/privacy/">Privacy</a>
+        <a href="/terms/">Terms</a>
+        <button class="text-button" id="export-data" type="button">Export my data</button>
+        <button class="text-button danger-text" id="clear-data" type="button">Clear local data</button>
+      </nav>
+      <p class="credit">Original AI-generated instrument image; provenance in the project design notes.</p>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden>
+      <span id="toast-message"></span>
+      <button class="text-button" id="toast-action" type="button" hidden></button>
+    </div>
+    <div class="tooltip" id="tooltip" role="tooltip" hidden></div>
+    <script type="module" src="/src/app.ts"></script>
+  </body>
+</html>

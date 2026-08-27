@@ -1,0 +1,16 @@
+{
+  "slug": "review-backlog-forecast",
+  "title": "Review Backlog Forecast",
+  "territory": "utilities",
+  "user": "A spaced-repetition learner returning after missed days who needs to recover a backlog without silently losing progress or creating one impossible session.",
+  "recurrence": "Learners cannot see or control the consequences of scheduling choices; backlogs turn a routine into a demoralizing unknown.",
+  "current_workaround": "Click reschedule, bury cards, skip reviews, or work through the pile until fatigue sets in.",
+  "incumbents_and_gap": "Anki offers rescheduling actions and review counts, while FSRS optimizes intervals; neither provides a plain-language recovery simulation before the learner changes cards.",
+  "smallest_useful_product": "A local import-and-preview tool that models three recovery policies (steady, deadline, gentle), shows cards/minutes per day and exactly which assumptions move cards. Non-goals: modifying Anki collections or guaranteeing retention.",
+  "success_measure": "At least 65% of returning pilot users choose a plan and reduce an overdue queue by 50% within 14 days without any planned session exceeding their cap.",
+  "artifact_class": "pwa-offline",
+  "monetization": "free",
+  "constraints": "Simulation must be reversible and clearly distinguish estimates from actual Anki scheduling; no collection credentials or sync access.",
+  "confidence": 4,
+  "state": "BUILT"
+}

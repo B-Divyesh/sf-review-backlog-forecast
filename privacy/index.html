@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#173f3a">
+    <meta name="description" content="Privacy policy for Review Backlog Forecast.">
+    <title>Privacy — Review Backlog Forecast</title>
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/src/legal.css">
+  </head>
+  <body>
+    <header><div><a href="/">← Back to the forecast</a><span>Review Backlog Forecast</span></div></header>
+    <main>
+      <p class="eyebrow">Privacy · Effective August 27, 2026</p>
+      <h1>Your queue stays on your instrument.</h1>
+      <p class="lede">Review Backlog Forecast is local-first. It does not send card counts, imported files, assumptions, or saved plans to us.</p>
+      <div class="notice"><b>In plain language:</b> your CSV is parsed in your browser. We have no collection credentials, Anki sync access, user account, advertising identifier, or analytics tracker.</div>
+      <h2>Data stored on your device</h2>
+      <p>When you run or save a plan, the app stores the forecast inputs and your most recent chosen plan in this browser’s IndexedDB. The service worker also caches the app shell and generated illustration so the utility can run offline.</p>
+      <h2>Imported files</h2>
+      <p>CSV and JSON files are read in browser memory. Their raw contents are not retained after parsing. Only the resulting queue totals and settings are stored if you run a forecast or restore a backup.</p>
+      <h2>Your controls</h2>
+      <ul>
+        <li>Use “Export my data” to download a portable JSON backup.</li>
+        <li>Use “Clear local data” to erase inputs and the saved plan.</li>
+        <li>Clear this site’s browser storage to remove cached offline files as well.</li>
+      </ul>
+      <h2>Network and third parties</h2>
+      <p>The production site needs a network connection only to download the static application. It loads no third-party fonts, scripts, analytics, or advertising. The generated instrument image is bundled with the app; no image service is contacted at runtime.</p>
+      <h2>Contact</h2>
+      <p>For a privacy question, open an issue in the project repository referenced in the README. Do not include collection exports or sensitive card content.</p>
+    </main>
+    <footer>Free utility by the Param Factory · No account · No collection access</footer>
+  </body>
+</html>
