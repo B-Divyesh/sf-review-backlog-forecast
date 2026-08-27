@@ -1,0 +1,8 @@
+{
+  "tool": "/opt/fleet/lib/gen-image.sh",
+  "model": "Azure AI Foundry factory image deployment",
+  "date": "2026-08-27",
+  "size": "1536x1024",
+  "quality": "high",
+  "prompt": "Editorial product still of a compact mid-century 1950s tabletop planning instrument, three adjacent physical forecast tracks with blank paper queue slips and precise tick marks, sea-green enamel casing, brushed brass knobs, a single restrained vermilion needle, dark rubber feet, on a warm parchment workbench, soft overcast window light, slightly elevated 35mm view, crisp practical industrial design, calm and trustworthy, no people, no hands, no readable text, no letters, no numbers, no logos, no watermark, no brands, no glowing screen, no cyberpunk, no gradient, no clutter."
+}
