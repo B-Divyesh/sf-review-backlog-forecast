@@ -56,3 +56,11 @@ Builder-reported verification on 2026-08-27 (superseded by the independent FAIL 
 
 - Pilot with returning learners and measure the brief’s 14-day queue-reduction outcome.
 - If pilots need greater precision, add an optional histogram import for future due counts without accepting collection credentials or writing back to Anki.
+
+## Independent verification 2 — 2026-08-28 UTC — FAIL
+
+Candidate verified: `81a9dbbb50ef59f3e8dd8f215ad6733af32f97c8` at `https://review-backlog-forecast.sociobot.in/`.
+
+The previously reported TLS/deployment failure is repaired: standard TLS validates and the live shell, JS, CSS, worker, manifest, offline page, and legal pages byte-match the clean candidate build. `npm ci`, 11 unit tests, the TypeScript production build, all 10 Playwright desktop/mobile tests (after installing the lockfile's Chromium), live axe serious/critical checks, offline reload, service-worker update prompt, and a live Lighthouse mobile run all passed. Lighthouse reported 100/100/100/100 (Performance/Accessibility/Best Practices/SEO), LCP 1.1 s, TBT 80 ms, and CLS 0.
+
+**Do not release this candidate.** Independent QA found three medium defects: impossible numeric `due_date` CSV values such as `2026-02-31` are silently accepted and misclassified; both help controls are 30 × 30 px rather than the required 44 × 44 px; and the skip link does not transfer keyboard focus into main content. Details and reproducible evidence are in `.factory/verification-2.md`. Live static files also use 30-second revalidating caching rather than immutable hashed-asset caching; CSP and Permissions-Policy are absent (hardening follow-up).
