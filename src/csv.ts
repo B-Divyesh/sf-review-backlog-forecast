@@ -77,10 +77,21 @@ export function parseCardCsv(text: string, today = new Date()): ImportSummary {
       else if (days === 0) dueToday += quantity;
       else future += quantity;
     } else {
-      const parts = row[dueIndex]?.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      const parts = row[dueIndex]?.match(/^(\d{4})-(\d{2})-(\d{2})$/);
       if (!parts) throw new Error(`Due date on row ${rowNumber + 2} must use YYYY-MM-DD.`);
-      const dueKey = new Date(Number(parts[1]), Number(parts[2]) - 1, Number(parts[3])).getTime();
-      if (!Number.isFinite(dueKey)) throw new Error(`Due date on row ${rowNumber + 2} is invalid.`);
+      const year = Number(parts[1]);
+      const month = Number(parts[2]);
+      const day = Number(parts[3]);
+      const dueDate = new Date(year, month - 1, day);
+      if (
+        !Number.isFinite(dueDate.getTime())
+        || dueDate.getFullYear() !== year
+        || dueDate.getMonth() !== month - 1
+        || dueDate.getDate() !== day
+      ) {
+        throw new Error(`Due date on row ${rowNumber + 2} must be a real calendar date in YYYY-MM-DD format.`);
+      }
+      const dueKey = dueDate.getTime();
       if (dueKey < todayKey) overdue += quantity;
       else if (dueKey === todayKey) dueToday += quantity;
       else future += quantity;

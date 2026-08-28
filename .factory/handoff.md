@@ -1,44 +1,27 @@
-# Handoff — Review Backlog Forecast v1
+# Handoff — Review Backlog Forecast repair
 
-## Current independent release status — FAIL
+## Release status
 
-**Candidate tested:** `81a9dbbb50ef59f3e8dd8f215ad6733af32f97c8`
-**Live URL tested:** <https://review-backlog-forecast.sociobot.in/>
-**Verification:** 2026-08-28 UTC, `.factory/verification-4.md`
+**Status:** repaired locally; static deployment verification follows the push.
 
-The earlier deployment/TLS problem is resolved: the live app byte-matches the candidate and its live offline reload and service-worker update work. It is nevertheless **not release-ready**. Fresh independent QA again reproduced three medium-severity contract failures:
+This repair addresses every release blocker in independent verification 4 (`.factory/verification-4.md`) for candidate `81a9dbbb50ef59f3e8dd8f215ad6733af32f97c8`, while preserving the local-first PWA and the existing forecast behavior.
 
-1. Impossible CSV calendar dates (for example `2026-02-31`) are accepted and silently normalized.
-2. The two help buttons are 30 × 30 px instead of the required 44 × 44 px touch targets.
-3. Activating the keyboard skip link leaves focus on `BODY`, not in main/forecast controls.
+## Repairs
 
-Fresh evidence: `npm ci`, `npm test` (11/11), exact `npm run build`, and `npm run test:e2e` (10/10) pass after installing the lockfile's Chromium; live Lighthouse scores are 100 Performance / 100 Accessibility. See `.factory/verification-4.md` for direct reproduction, PWA update/offline evidence, bundle sizes, privacy/outbound-request checks, response headers, and required fixes.
+1. **Impossible calendar dates are rejected.** Card-row `due_date` values now require an exact `YYYY-MM-DD` string and their parsed year/month/day must round-trip unchanged. For example, `2026-02-31` reports `Due date on row 2 must be a real calendar date in YYYY-MM-DD format.` rather than silently becoming March 3.
+2. **Help controls meet the touch contract.** Both question-mark help buttons now have 44 × 44 CSS-pixel hit areas, including at the required 390 × 844 viewport.
+3. **Skip link moves focus.** `main#main` is programmatically focusable and the skip-link handler updates `#main`, scrolls there, and explicitly focuses it. Keyboard users now land in main content rather than on `BODY`.
+4. **Installed clients receive the repair.** The service-worker cache version is `rbf-v1.0.2`, which causes the changed static shell to install and surface the existing update prompt.
+5. **Reproducible browser runner.** Playwright is pinned to `1.58.2`, matching the worker-provided Chromium installation.
 
-## Independent verification status: **FAIL — do not release**
+## Regression coverage
 
-**Candidate tested:** `81a9dbbb50ef59f3e8dd8f215ad6733af32f97c8`
-**Required URL:** `https://review-backlog-forecast.sociobot.in/`
-**Verified:** 2026-08-27 UTC
+- Unit: rejects `due_date,count\\n2026-02-31,1` with the actionable real-calendar-date error.
+- Browser, both desktop and mobile projects: invalid calendar-date import keeps the form empty and announces the correction.
+- Browser, both projects: each named help control measures at least 44 × 44 CSS px at 390px.
+- Browser, both projects: Tab reaches the skip link and Enter leaves `main` focused with `#main` in the URL.
 
-The clean local candidate builds and its unit/browser checks pass, but the required production URL is not usable: Chromium reports `ERR_CERT_COMMON_NAME_INVALID`; normal curl rejects the certificate; and an insecure diagnostic request to `/` receives Azure `404 Site Not Found`, not the app. The deployment does not establish a match to the candidate and cannot be released.
-
-Additional medium-severity accessibility defect: the two mobile help (`?`) buttons measure 30 × 30 CSS px, below the required 44 × 44 px touch target.
-
-See `.factory/verification.md` for exact commands, local behavioral evidence (including offline reload and service-worker update), bundle/Lighthouse results, privacy/outbound-request checks, and all remediation steps. This verifier status supersedes the builder-reported verification notes below.
-
-## What shipped
-
-- A complete import-and-preview recovery planner with **Steady**, **Deadline**, and **Gentle** policies.
-- Manual queue inputs plus two CSV shapes: one-row totals and one-card/group-per-row `due_date` or `days_overdue` imports.
-- A hard minute cap in the forecast engine. Due-today and estimated regular reviews use capacity before overdue cards; regular rollover stays visible instead of being hidden.
-- Plan comparison, 21-day visual plot, up to 60 days of accessible daily ledger detail, half-queue/finish estimates, deadline feasibility warnings, schedule CSV export, and clear non-guarantee language.
-- IndexedDB persistence for inputs and the selected plan, reversible plan replacement, JSON data export/restore, and confirmed local-data deletion.
-- Installable local-first PWA with a versioned service worker, deterministic precached app shell, cache-first same-origin assets, offline fallback, update prompt, 192/512/maskable icons, and matching splash colors.
-- Responsive 390px and keyboard layouts, designed focus states, reduced-motion fallback, semantic structure, one H1, alt text, live validation/status, and a keyboard-focusable wide ledger.
-- Privacy and terms pages, README, MIT license, robots.txt, and sitemap.
-- Product-specific mid-century instrument-panel system and generated-asset provenance in `.factory/design.md`. The original source is retained in `assets/src/`; shipped WebP files are 26 KB and 67 KB.
-
-## Run and verify
+## Verification run — 2026-08-28 UTC
 
 ```sh
 npm ci
@@ -47,34 +30,29 @@ npm run build
 npm run test:e2e
 ```
 
-The deploy command is exactly `npm run build`. It produces `dist/index.html`, `dist/privacy/index.html`, and `dist/terms/index.html`.
+- Clean install: 59 packages added; `npm audit` reported 0 vulnerabilities.
+- Unit/integration: **12/12** Vitest tests passed.
+- Type check and production build: passed (`tsc --noEmit && vite build`); `dist/index.html`, legal pages, manifest, worker, and static assets were emitted.
+- Browser: **16/16** Playwright tests passed across desktop and the 390 × 844 touch profile. This includes real forecast/save/restore, invalid import recovery, keyboard skip link, 44px target measurements, no 390px page overflow, IndexedDB persistence, offline reload, and Axe WCAG 2/2.1 A/AA serious/critical checks.
+- Accessibility: the Axe test reported no serious or critical violations; the keyboard focus regression passes; visual inspection of the 390px forecast confirms the full plan and ledger remain readable without page-level horizontal overflow.
+- Offline: the Playwright suite first obtains service-worker control, sets the browser offline, reloads, and completes a new forecast successfully.
+- Update: an isolated static-server test served `rbf-v1.0.2`, then a changed worker `rbf-v1.0.3`; it observed `A new version is ready.`, clicked Update, confirmed the replacement cache activated, and captured no console errors.
+- Privacy: a populated 390px browser flow made four requests, all to `http://127.0.0.1:4173`, with no console errors. Source remains local-only: no analytics, accounts, third-party scripts/fonts, or API calls.
+- Response/static checks: local preview returned 200 for `/`, `manifest.webmanifest`, and `sw.js`; the manifest uses `application/manifest+json` and the worker uses `text/javascript`. The production host's CSP/frame/immutable-cache policy remains deployment configuration rather than repository code; the verifier classed those as hardening follow-ups, not release blockers.
+- Bundle: `app.js` is 18.54 KB raw / 7.33 KB gzip and `app.css` is 21.57 KB raw / 5.36 KB gzip, both well within the static-PWA budgets.
 
-Builder-reported verification on 2026-08-27 (superseded by the independent FAIL above):
+## Run and deploy
 
-- `npm test`: 11/11 unit tests passed.
-- `npm run build`: passed; initial app JavaScript 18.21 KB raw / 7.22 KB gzip, CSS 21.56 KB raw / 5.36 KB gzip.
-- Playwright Chromium: desktop and 390×844 mobile flows passed for forecast creation, policy selection, CSV import, IndexedDB persistence, viewport overflow, and interactive offline reopen after first visit.
-- Axe via Playwright: no serious or critical WCAG 2/2.1 A/AA violations in the populated application on desktop or mobile.
-- Factory `verify-url.sh`: HTTP 200, title and `lang`, one H1, main landmark, all images with alt, all buttons labelled, and no console errors.
-- Lighthouse 12.8.2, mobile defaults against the production preview: Performance **100**, Accessibility **100**, Best Practices **100**, SEO **100**; FCP **0.9 s**, LCP **1.2 s**, TBT **0 ms**, CLS **0**, Speed Index **0.9 s**.
-- Production asset checks: mobile hero 26,300 bytes; large hero 67,352 bytes; no runtime CDN requests.
+```sh
+npm ci
+npm test
+npm run build
+npm run test:e2e
+```
+
+Deployment remains the original static workflow: `npm run build` produces `dist/` with `index.html` at its root. Push `main` to trigger the factory's static deployment configuration.
 
 ## Known boundaries
 
-- This models counts, not card identities or future Anki/FSRS intervals. It intentionally cannot open `.apkg`/collection databases or reschedule cards.
-- For card-row imports, future-due rows are divided across 28 days to propose an editable daily-due estimate. The UI labels that value as an estimate.
-- Forecasts extend up to 730 days. The on-screen ledger is capped at 60 days for usability; the exported schedule contains at least 28 days and continues through the projected finish when it falls within the model horizon.
-- No analytics or page counter is included. The product is free and has no billing integration.
-
-## Suggested next steps
-
-- Pilot with returning learners and measure the brief’s 14-day queue-reduction outcome.
-- If pilots need greater precision, add an optional histogram import for future due counts without accepting collection credentials or writing back to Anki.
-
-## Independent verification 2 — 2026-08-28 UTC — FAIL
-
-Candidate verified: `81a9dbbb50ef59f3e8dd8f215ad6733af32f97c8` at `https://review-backlog-forecast.sociobot.in/`.
-
-The previously reported TLS/deployment failure is repaired: standard TLS validates and the live shell, JS, CSS, worker, manifest, offline page, and legal pages byte-match the clean candidate build. `npm ci`, 11 unit tests, the TypeScript production build, all 10 Playwright desktop/mobile tests (after installing the lockfile's Chromium), live axe serious/critical checks, offline reload, service-worker update prompt, and a live Lighthouse mobile run all passed. Lighthouse reported 100/100/100/100 (Performance/Accessibility/Best Practices/SEO), LCP 1.1 s, TBT 80 ms, and CLS 0.
-
-**Do not release this candidate.** Independent QA found three medium defects: impossible numeric `due_date` CSV values such as `2026-02-31` are silently accepted and misclassified; both help controls are 30 × 30 px rather than the required 44 × 44 px; and the skip link does not transfer keyboard focus into main content. Details and reproducible evidence are in `.factory/verification-2.md`. Live static files also use 30-second revalidating caching rather than immutable hashed-asset caching; CSP and Permissions-Policy are absent (hardening follow-up).
+- The app forecasts counts locally and intentionally does not read, modify, authenticate to, or sync with Anki.
+- Production response hardening (CSP, Permissions-Policy, frame protection, and immutable asset headers) is not represented in this static repository and needs the deployment owner. It was not a release-blocking defect in the independent report.

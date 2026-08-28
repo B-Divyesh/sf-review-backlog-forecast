@@ -35,6 +35,36 @@ test("imports a summary CSV and reports the result", async ({ page }) => {
   await expect(page.locator("#daily-due")).toHaveValue("22");
 });
 
+test("rejects impossible calendar dates during CSV import", async ({ page }) => {
+  await page.goto("/");
+  await page.locator("#queue-file").setInputFiles({
+    name: "invalid-calendar-date.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from("due_date,count\n2026-02-31,1\n")
+  });
+  await expect(page.getByText("Due date on row 2 must be a real calendar date in YYYY-MM-DD format.")).toBeVisible();
+  await expect(page.locator("#overdue")).toHaveValue("");
+});
+
+test("gives compact help controls a 44px touch target at 390px", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  for (const button of await page.getByRole("button", { name: /About (overdue cards|cards due today)/ }).all()) {
+    const box = await button.boundingBox();
+    expect(box?.width).toBeGreaterThanOrEqual(44);
+    expect(box?.height).toBeGreaterThanOrEqual(44);
+  }
+});
+
+test("moves keyboard focus to main when the skip link is activated", async ({ page }) => {
+  await page.goto("/");
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("link", { name: "Skip to forecast controls" })).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("main")).toBeFocused();
+  await expect(page).toHaveURL(/#main$/);
+});
+
 test("has no serious accessibility violations", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Try an example" }).click();

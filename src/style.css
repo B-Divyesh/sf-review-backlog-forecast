@@ -422,9 +422,9 @@ main { display: block; }
 .accent-dial::after { position: absolute; top: 0; right: 16px; left: 16px; height: 4px; background: var(--vermilion); content: ""; }
 
 .hint {
-  width: 30px;
-  height: 30px;
-  margin-left: 6px;
+  width: 44px;
+  height: 44px;
+  margin: -7px -7px -7px -1px;
   border: 1px solid rgb(255 248 232 / 45%);
   border-radius: 50%;
   color: var(--cream);

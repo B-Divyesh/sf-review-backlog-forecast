@@ -23,6 +23,12 @@ describe("CSV import", () => {
     });
   });
 
+  it("rejects impossible calendar dates instead of normalizing them", () => {
+    expect(() => parseCardCsv("due_date,count\n2026-02-31,1\n", new Date("2026-02-27T12:00:00"))).toThrow(
+      "Due date on row 2 must be a real calendar date in YYYY-MM-DD format."
+    );
+  });
+
   it("supports days_overdue and grouped counts", () => {
     const csv = "days_overdue,count\n12,4\n0,3\n-2,8\n";
     expect(parseCardCsv(csv)).toMatchObject({ overdue: 4, dueToday: 3, dailyDue: 1 });

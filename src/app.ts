@@ -20,12 +20,20 @@ const savedStrip = $("#saved-strip");
 const toast = $("#toast");
 const toastMessage = $("#toast-message");
 const toastAction = $<HTMLButtonElement>("#toast-action");
+const main = $("#main");
 
 let forecasts: PolicyForecast[] = [];
 let currentInput: ForecastInput | null = null;
 let selectedPolicy: PolicyId = "steady";
 let savedPlan: SavedPlan | undefined;
 let toastTimer = 0;
+
+document.querySelector<HTMLAnchorElement>(".skip-link")?.addEventListener("click", (event) => {
+  event.preventDefault();
+  window.location.hash = main.id;
+  main.focus({ preventScroll: true });
+  main.scrollIntoView({ block: "start" });
+});
 
 function announce(message: string, action?: { label: string; run: () => void }): void {
   window.clearTimeout(toastTimer);
