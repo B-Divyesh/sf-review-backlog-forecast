@@ -1,5 +1,19 @@
 # Handoff — Review Backlog Forecast v1
 
+## Current independent release status — FAIL
+
+**Candidate tested:** `81a9dbbb50ef59f3e8dd8f215ad6733af32f97c8`
+**Live URL tested:** <https://review-backlog-forecast.sociobot.in/>
+**Verification:** 2026-08-28 UTC, `.factory/verification-3.md`
+
+The earlier deployment/TLS problem is resolved: the live app byte-matches the candidate and its live offline reload works. It is nevertheless **not release-ready**. Independent QA found three medium-severity contract failures:
+
+1. Impossible CSV calendar dates (for example `2026-02-31`) are accepted and silently normalized.
+2. The two help buttons are 30 × 30 px instead of the required 44 × 44 px touch targets.
+3. Activating the keyboard skip link leaves focus on `BODY`, not in main/forecast controls.
+
+Fresh evidence: `npm ci`, `npm test` (11/11), exact `npm run build`, and `npm run test:e2e` (10/10) pass; live Lighthouse scores are 100/100/100/100. See the verification report for reproduction, PWA update/offline evidence, bundle sizes, privacy/outbound-request checks, response headers, and required fixes.
+
 ## Independent verification status: **FAIL — do not release**
 
 **Candidate tested:** `81a9dbbb50ef59f3e8dd8f215ad6733af32f97c8`
