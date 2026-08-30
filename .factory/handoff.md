@@ -2,7 +2,7 @@
 
 ## Release status
 
-**Status:** repaired, locally verified, and ready for the static deployment triggered by pushing `main`.
+**Status:** repaired and locally verified. Commit `ff72159` was pushed to `main`; the static host had not promoted that artifact at the time of the final live check.
 
 This repair preserves the local-first forecast PWA and corrects every release-blocking finding in independent verification 4 (`.factory/verification-4.md`) for candidate `81a9dbbb50ef59f3e8dd8f215ad6733af32f97c8`.
 
@@ -49,6 +49,10 @@ npm run test:e2e
 ```
 
 `npm run build` produces `dist/index.html`. Pushing `main` is the static deployment path. After deployment, verify `https://review-backlog-forecast.sociobot.in/` with normal TLS, live asset identity, headers, and offline reload.
+
+### Live deployment evidence at handoff
+
+Normal TLS for `https://review-backlog-forecast.sociobot.in/` succeeds, but the live root still had SHA-256 `12cd57587c99de7f41c77fa8d89f6f9b884fa451c6ad2ebccdfb900d132382bf`; this repair's local `dist/index.html` is `6d92920d035105209315926f882f7d2d31bac08d223ba40c1a742a0c5c5799ee`. The repository has no checked-in deployment workflow, and GitHub's Actions/deployments API returned no run after the push. Live identity and response-header verification therefore remain pending the factory's static promotion; they must not be inferred from the local checks.
 
 ## Known boundaries
 
