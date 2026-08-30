@@ -64,5 +64,8 @@ The hero uses one generated editorial still: a small tabletop forecasting consol
 - Negative list: text, letters, numbers, logos, watermark, people, hands, brand marks, glowing screens, cyberpunk, gradients, clutter, warped geometry.
 - Production prompt: “Editorial product still of a compact mid-century 1950s tabletop planning instrument, three adjacent physical forecast tracks with blank paper queue slips and precise tick marks, sea-green enamel casing, brushed brass knobs, a single restrained vermilion needle, dark rubber feet, on a warm parchment workbench, soft overcast window light, slightly elevated 35mm view, crisp practical industrial design, calm and trustworthy, no people, no hands, no readable text, no letters, no numbers, no logos, no watermark, no brands, no glowing screen, no cyberpunk, no gradient, no clutter.”
 
-Generation: Azure AI Foundry factory image deployment via `/opt/fleet/lib/gen-image.sh`, 2026-08-27. Generated imagery is original for this product. Source PNG and exact prompt sidecar live in `assets/src/`; shipped WebP/AVIF renditions are optimized derivatives.
+Generation: Azure AI Foundry factory image deployment via `/opt/fleet/lib/gen-image.sh`, 2026-08-27. Generated imagery is original for this product. Source PNG and exact prompt sidecar live in `assets/src/`; shipped WebP renditions are optimized derivatives.
 
+The 1200 × 630 social preview is a center-cropped, compressed derivative of the same reviewed source image. No new subject matter was generated. Shipped asset names include their content hashes so the static host can cache them immutably.
+
+Demo mode applies its banner state from a 204-byte same-origin bootstrap before first paint. This keeps the persistent sandbox notice in the initial layout and prevents a delayed module from shifting the mobile page. It introduces no additional motion.

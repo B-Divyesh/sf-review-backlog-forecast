@@ -17,14 +17,16 @@ export const POLICY_META: Record<PolicyId, { name: string; shortDescription: str
 
 export function validateInput(input: ForecastInput): string[] {
   const errors: string[] = [];
-  const counts: Array<[keyof ForecastInput, string]> = [
-    ["overdue", "Overdue cards"],
-    ["dueToday", "Due today"],
-    ["dailyDue", "Usual daily due"],
-    ["newCards", "New cards per day"]
+  const counts: Array<[keyof ForecastInput, string, number]> = [
+    ["overdue", "Overdue cards", 100_000],
+    ["dueToday", "Due today", 100_000],
+    ["dailyDue", "Usual daily due", 100_000],
+    ["newCards", "New cards per day", 10_000]
   ];
-  for (const [key, label] of counts) {
-    if (!Number.isInteger(input[key]) || input[key] < 0) errors.push(`${label} must be a whole number of 0 or more.`);
+  for (const [key, label, maximum] of counts) {
+    if (!Number.isInteger(input[key]) || input[key] < 0 || input[key] > maximum) {
+      errors.push(`${label} must be a whole number between 0 and ${maximum.toLocaleString("en-US")}.`);
+    }
   }
   if (!Number.isFinite(input.secondsPerCard) || input.secondsPerCard < 3 || input.secondsPerCard > 300) {
     errors.push("Seconds per card must be between 3 and 300.");

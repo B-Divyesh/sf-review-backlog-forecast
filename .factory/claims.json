@@ -1,30 +1,114 @@
 [
   {
+    "id": "three-policies",
+    "claim": "Compares distinct Steady, Deadline, and Gentle recovery policies",
+    "where": "Landing page, forecast results, and README",
+    "test": "npm test -- -t @claim:three-policies",
+    "sandbox": "The sample is simulated under all three policies and their schedules are compared."
+  },
+  {
     "id": "hard-session-cap",
-    "claim": "Never schedules beyond your session cap",
-    "where": "Landing page and forecast controls",
+    "claim": "Never schedules beyond the configured session cap",
+    "where": "Landing page, forecast controls, terms, and README",
     "test": "npm test -- -t @claim:hard-session-cap",
-    "sandbox": "The shipped 320-overdue sample is simulated under every recovery policy; each visible day is at or below the configured 30-minute cap."
+    "sandbox": "Every day under every policy is checked against the sample's 30-minute cap."
+  },
+  {
+    "id": "due-today-priority",
+    "claim": "Schedules due-today work before overdue recovery",
+    "where": "Forecast explanation, terms, and README",
+    "test": "npm test -- -t @claim:due-today-priority",
+    "sandbox": "A constrained sample proves due-today cards consume capacity before overdue cards."
+  },
+  {
+    "id": "rollover-visible",
+    "claim": "Keeps unreviewed regular work visible as rollover",
+    "where": "Forecast explanation and README",
+    "test": "npm test -- -t @claim:rollover-visible",
+    "sandbox": "An overloaded sample produces visible nonzero regular rollover and an off-target state."
   },
   {
     "id": "csv-import",
-    "claim": "Imports a queue summary CSV",
+    "claim": "Imports a one-row queue summary CSV",
     "where": "Import controls and README",
     "test": "npm run test:e2e -- --grep @claim:csv-import",
-    "sandbox": "A fresh browser imports the documented summary CSV and observes every imported queue value."
+    "sandbox": "A fresh demo imports the documented summary and observes each resulting queue value."
+  },
+  {
+    "id": "grouped-csv-import",
+    "claim": "Imports grouped due_date or days_overdue CSV rows",
+    "where": "Import controls and README",
+    "test": "npm run test:e2e -- --grep @claim:grouped-csv-import",
+    "sandbox": "A fresh demo imports both documented row formats with grouped quantities and checks the totals."
   },
   {
     "id": "offline-reload",
     "claim": "Works offline after the first visit",
-    "where": "README and offline page",
+    "where": "Header, offline page, privacy page, and README",
     "test": "npm run test:e2e -- --grep @claim:offline-reload",
-    "sandbox": "A fresh browser opens ?demo=1, waits for service-worker control, goes offline, reloads, and observes the forecast."
+    "sandbox": "An isolated browser context loads the demo, gains service-worker control, goes offline, reloads, and observes the forecast."
   },
   {
     "id": "local-only",
-    "claim": "Sample planning data stays on this device",
-    "where": "Landing page, demo banner, and privacy page",
+    "claim": "Imported raw card content is neither uploaded nor retained",
+    "where": "Landing import panel, privacy page, and README",
     "test": "npm run test:e2e -- --grep @claim:local-only",
-    "sandbox": "A fresh demo browser records every request while it selects and saves a sample plan; all observed origins are the app origin."
+    "sandbox": "A uniquely marked CSV is imported in a fresh demo; all requests stay same-origin and browser storage contains no marker."
+  },
+  {
+    "id": "demo-isolation",
+    "claim": "Demo activity never reads or changes the real-plan database",
+    "where": "Demo banner, README, and demo documentation",
+    "test": "npm run test:e2e -- --grep @claim:demo-isolation",
+    "sandbox": "A real plan is saved before demo mode opens; the demo shows only its sample values and no real saved plan."
+  },
+  {
+    "id": "local-persistence",
+    "claim": "A chosen plan is stored in the current browser",
+    "where": "Saved-plan strip, privacy page, and README",
+    "test": "npm run test:e2e -- --grep @claim:local-persistence",
+    "sandbox": "A demo plan is saved, the page reloads, and the chosen plan returns from the demo IndexedDB namespace."
+  },
+  {
+    "id": "backup-roundtrip",
+    "claim": "Exports and restores a portable JSON backup",
+    "where": "Import and footer controls, privacy page, and README",
+    "test": "npm run test:e2e -- --grep @claim:backup-roundtrip",
+    "sandbox": "The demo exports its inputs and chosen plan, clears them, imports the download, and observes both restored."
+  },
+  {
+    "id": "schedule-export",
+    "claim": "Exports the selected daily schedule as CSV",
+    "where": "Forecast controls and README",
+    "test": "npm run test:e2e -- --grep @claim:schedule-export",
+    "sandbox": "The demo downloads the selected policy with the documented header and one row for every exported day."
+  },
+  {
+    "id": "clear-local-data",
+    "claim": "Clears saved inputs and the chosen plan from local storage",
+    "where": "Footer control and privacy page",
+    "test": "npm run test:e2e -- --grep @claim:clear-local-data",
+    "sandbox": "The demo saves a plan, confirms Clear local data, then checks the interface and demo IndexedDB are empty."
+  },
+  {
+    "id": "anki-isolation",
+    "claim": "Previews counts without connecting to or changing Anki",
+    "where": "Landing page, forecast controls, terms, and README",
+    "test": "npm run test:e2e -- --grep @claim:anki-isolation",
+    "sandbox": "A fresh demo forecasts and exports while every observed request remains on the product origin and none targets Anki."
+  },
+  {
+    "id": "no-third-party-runtime",
+    "claim": "Loads no third-party fonts, scripts, analytics, advertising, or runtime image service",
+    "where": "Privacy page and README",
+    "test": "npm run test:e2e -- --grep @claim:no-third-party-runtime",
+    "sandbox": "A fresh demo records every request and dependency element; all are same-origin and no font request occurs."
+  },
+  {
+    "id": "no-account",
+    "claim": "Runs free without an account or payment step",
+    "where": "Landing footer, privacy page, terms, and README",
+    "test": "npm run test:e2e -- --grep @claim:no-account",
+    "sandbox": "A fresh visitor opens the one-click sample and reaches the complete forecast without credentials, billing, or payment requests."
   }
 ]

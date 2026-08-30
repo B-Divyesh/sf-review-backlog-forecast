@@ -140,8 +140,9 @@ h3 { margin-bottom: 8px; font-size: 1.55rem; }
 .wordmark-mark i:nth-child(2) { height: 72%; background: var(--brass); }
 .wordmark-mark i:nth-child(3) { height: 100%; background: var(--vermilion); }
 
-.header-tools { display: flex; align-items: center; gap: 24px; font-family: var(--display); font-size: 0.85rem; }
-.header-tools a { min-height: 44px; display: inline-flex; align-items: center; }
+.header-tools,
+.header-tools nav { display: flex; align-items: center; gap: 24px; font-family: var(--display); font-size: 0.85rem; }
+.header-tools nav a { display: inline-flex; align-items: center; min-width: 44px; min-height: 44px; justify-content: center; }
 
 .connection {
   display: inline-flex;
@@ -693,7 +694,7 @@ footer {
 .footer-brand { display: flex; align-items: center; gap: 14px; }
 .footer-brand p { margin: 0; font-size: 0.85rem; }
 footer nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: end; gap: 8px 24px; font-family: var(--display); font-size: 0.82rem; }
-footer nav a { display: inline-flex; align-items: center; min-height: 44px; }
+footer nav a { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 0 4px; }
 footer .text-button:hover { color: var(--vermilion-dark); }
 .danger-text { color: var(--danger); }
 .credit { grid-column: 1 / -1; margin: 0; padding-top: 24px; border-top: 1px solid var(--paper-deep); color: var(--muted); font-size: 0.75rem; }
@@ -742,6 +743,7 @@ footer .text-button:hover { color: var(--vermilion-dark); }
 }
 
 [hidden] { display: none !important; }
+.demo-mode .demo-banner[hidden] { display: flex !important; }
 
 @media (max-width: 1040px) {
   .hero { grid-template-columns: 1fr 1fr; gap: 40px; min-height: 640px; }
@@ -752,7 +754,7 @@ footer .text-button:hover { color: var(--vermilion-dark); }
 }
 
 @media (max-width: 840px) {
-  .header-tools a { display: none; }
+  .header-tools nav a:not(:first-child) { display: none; }
   .hero { grid-template-columns: 1fr; min-height: auto; padding-top: 48px; }
   .hero-instrument { width: min(100%, 680px); }
   .import-panel { grid-template-columns: 1fr; }

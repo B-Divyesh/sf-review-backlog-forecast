@@ -14,11 +14,14 @@ const base: ForecastInput = {
 };
 
 describe("forecast simulation", () => {
-  it("builds all three distinct recovery policies", () => {
-    const forecasts = simulateAll(base, new Date("2026-08-27T12:00:00"));
+  it("@claim:three-policies builds all three distinct recovery policies", () => {
+    const forecasts = simulateAll({ ...base, deadlineDays: 7 }, new Date("2026-08-27T12:00:00"));
     expect(forecasts.map((forecast) => forecast.id)).toEqual(["steady", "deadline", "gentle"]);
     expect(forecasts.every((forecast) => forecast.days.length >= 42)).toBe(true);
-    expect(forecasts[0].days.map((day) => day.overdueReviewed)).not.toEqual(forecasts[2].days.map((day) => day.overdueReviewed));
+    const schedules = forecasts.map((forecast) => JSON.stringify(forecast.days.map((day) => day.overdueReviewed)));
+    expect(new Set(schedules).size).toBe(3);
+    expect(forecasts[1].finishDay).toBeLessThanOrEqual(7);
+    expect(forecasts[2].days[0].overdueReviewed).toBeLessThan(forecasts[0].days[0].overdueReviewed);
   });
 
   it("@claim:hard-session-cap never exceeds the hard session cap", () => {
@@ -28,7 +31,7 @@ describe("forecast simulation", () => {
     }
   });
 
-  it("protects due-today cards before overdue recovery", () => {
+  it("@claim:due-today-priority protects due-today cards before overdue recovery", () => {
     const constrained = { ...base, dueToday: 100, overdue: 100, capMinutes: 20, secondsPerCard: 12 };
     const firstDay = simulatePolicy(constrained, "deadline").days[0];
     expect(firstDay.regularReviewed).toBe(100);
@@ -36,7 +39,7 @@ describe("forecast simulation", () => {
     expect(firstDay.overdueRemaining).toBe(100);
   });
 
-  it("keeps regular rollover visible when normal demand exceeds capacity", () => {
+  it("@claim:rollover-visible keeps regular rollover visible when normal demand exceeds capacity", () => {
     const overloaded = { ...base, dueToday: 200, dailyDue: 200, capMinutes: 10 };
     const forecast = simulatePolicy(overloaded, "deadline");
     expect(forecast.days[0].regularRollover).toBe(150);
@@ -53,9 +56,16 @@ describe("forecast simulation", () => {
 
   it("reports validation errors for impossible inputs", () => {
     expect(validateInput({ ...base, overdue: -1, secondsPerCard: 1, studyDays: 8 })).toEqual([
-      "Overdue cards must be a whole number of 0 or more.",
+      "Overdue cards must be a whole number between 0 and 100,000.",
       "Seconds per card must be between 3 and 300.",
       "Study days must be between 1 and 7 per week."
     ]);
+  });
+
+  it("rejects every declared count maximum before simulation", () => {
+    expect(validateInput({ ...base, overdue: 100_001 })).toContain("Overdue cards must be a whole number between 0 and 100,000.");
+    expect(validateInput({ ...base, dueToday: 100_001 })).toContain("Due today must be a whole number between 0 and 100,000.");
+    expect(validateInput({ ...base, dailyDue: 100_001 })).toContain("Usual daily due must be a whole number between 0 and 100,000.");
+    expect(validateInput({ ...base, newCards: 10_001 })).toContain("New cards per day must be a whole number between 0 and 10,000.");
   });
 });

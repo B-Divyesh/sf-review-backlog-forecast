@@ -366,11 +366,15 @@ async function registerServiceWorker(): Promise<void> {
 async function init(): Promise<void> {
   try {
     if (isDemo) {
+      document.title = "Demo — Review Backlog Forecast";
       $("#demo-banner").hidden = false;
       populateForm(sampleInput);
       renderForecast(sampleInput, false);
+      await updateSavedStrip();
       $("#reset-demo").addEventListener("click", async () => {
         await storage.clearAll();
+        savedPlan = undefined;
+        savedStrip.hidden = true;
         selectedPolicy = "steady";
         populateForm(sampleInput);
         renderForecast(sampleInput, false);
@@ -381,6 +385,9 @@ async function init(): Promise<void> {
         await storage.clearAll();
         window.location.assign("/");
       });
+      if (window.location.hash === "#guide") {
+        requestAnimationFrame(() => $("#guide").scrollIntoView({ block: "start" }));
+      }
       registerServiceWorker().catch(() => { /* App remains usable without install support. */ });
       return;
     }

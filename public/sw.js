@@ -1,23 +1,7 @@
-const VERSION = "rbf-v1.0.2";
+const VERSION = "rbf-v1.0.3";
 const SHELL_CACHE = `${VERSION}-shell`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
-const SHELL = [
-  "/",
-  "/?source=pwa&v=1",
-  "/offline.html",
-  "/privacy/",
-  "/terms/",
-  "/assets/app.js",
-  "/assets/app.css",
-  "/assets/legal.css",
-  "/manifest.webmanifest",
-  "/icons/icon.svg",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png",
-  "/icons/icon-maskable-512.png",
-  "/assets/recovery-console-720.webp",
-  "/assets/recovery-console-1200.webp"
-];
+const SHELL = ["/"]; // BUILD_INJECT_SHELL
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(SHELL_CACHE).then((cache) => cache.addAll(SHELL)));
