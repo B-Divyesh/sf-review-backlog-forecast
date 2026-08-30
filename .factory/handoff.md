@@ -2,7 +2,7 @@
 
 ## Release status
 
-**READY TO DEPLOY.** This repair addresses every release blocker in independent verification 6 for candidate `bad1a4aa0a875870849736ba7108145c4d2505f8`.
+**DEPLOYED.** Repair commit `f0ff6533381df75ffa246894374e5d272b332fea` addresses every release blocker in independent verification 6 for candidate `bad1a4aa0a875870849736ba7108145c4d2505f8`.
 
 ## What changed
 
@@ -29,6 +29,10 @@
 - Offline reload and waiting-worker update tests passed in isolated browser contexts. Privacy/request tests passed with only same-origin requests and no Anki, account, billing, or third-party runtime path.
 - Local Lighthouse 12.8.2 mobile on `/?demo=1`: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 0.9 s, LCP 1.4 s, TBT 20 ms, CLS 0, total transfer 71 KiB.
 - Built app JS: 20,103 B raw / 7.85 kB gzip. Built app CSS: 22,780 B raw / 5.59 kB gzip. Mobile hero: 26,300 B.
+- Deployed via the configured static target `sf-review-backlog-forecast` (deployment `1e6b7f44-479a-4994-9149-893f5f1cc16b`); HTTPS 200 and the custom domain reported `Ready`.
+- Live identity: SHA-256 matched local `dist/` for `index.html`, app JS, app CSS, `sw.js`, manifest, offline document, styled 404, Privacy, and Terms. The live root is build `1.0.4`, includes `Free` and the stale-result notice markup, and an unknown route returns HTTP 404.
+- Live response policy includes HSTS, CSP with `frame-ancestors 'none'`, Permissions-Policy, strict referrer policy, `nosniff`, and `X-Frame-Options: DENY`.
+- Live factory URL check at `https://review-backlog-forecast.sociobot.in/?demo=1`: HTTP 200; 700 ms network-idle load; correct title/lang/one h1/main; no missing alt text or unnamed buttons; no console or page errors. Live Axe scans on the Demo page found zero serious/critical violations in desktop and 390px mobile.
 
 ## Deploy and rerun
 
@@ -41,8 +45,8 @@ npm run build
 npm run test:e2e
 ```
 
-Deploy the static `dist/` directory using this repository's configured static deployment. After deployment, verify `https://review-backlog-forecast.sociobot.in/?demo=1` for the stale-result sequence, radio-arrow focus, Undo target, and the deployed asset identity.
+The production static build is deployed at <https://review-backlog-forecast.sociobot.in/>. Rerun the commands above for a clean local verification, then compare deployed artifacts to `dist/` if a later release changes the static files.
 
 ## Known gaps
 
-None for the repaired scope. A live identity and response-policy check follows the deployment push.
+None for the repaired scope.
