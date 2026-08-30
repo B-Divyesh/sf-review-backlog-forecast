@@ -195,6 +195,37 @@ main { display: block; }
   line-height: 1.55;
 }
 
+.hero-action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 20px;
+  margin: 0 0 28px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.hero-action .button-primary { background: var(--vermilion); }
+
+.demo-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: min(1296px, calc(100% - 40px));
+  margin: 24px auto -24px;
+  padding: 12px 16px;
+  border-left: 5px solid var(--brass);
+  color: var(--cream);
+  background: var(--enamel);
+  font-family: var(--display);
+  font-size: 0.86rem;
+}
+
+.demo-banner p { margin: 0; }
+.demo-banner div { display: flex; flex-wrap: wrap; gap: 16px; }
+.demo-banner .text-button { color: var(--cream); }
+
 .trust-list {
   display: flex;
   flex-wrap: wrap;
@@ -743,6 +774,7 @@ footer .text-button:hover { color: var(--vermilion-dark); }
   .connection { font-size: 0; }
   .connection::after { content: "Offline ready"; font-size: 0.72rem; }
   .hero { gap: 40px; padding-top: 52px; padding-bottom: 96px; }
+  .demo-banner { align-items: start; flex-direction: column; gap: 8px; margin-top: 12px; margin-bottom: -32px; }
   h1 { font-size: clamp(2.6rem, 13vw, 4rem); }
   .lede { font-size: 1.06rem; }
   .hero-instrument { margin-right: -12px; padding: 10px 10px 12px; transform: rotate(0.5deg); }

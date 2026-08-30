@@ -1,6 +1,10 @@
 import type { ForecastInput, SavedPlan } from "./types";
 
-const DB_NAME = "review-backlog-forecast";
+// Demo data deliberately uses a separate database. A visitor can explore the
+// sample without reading or changing plans saved for themselves.
+const DB_NAME = new URLSearchParams(window.location.search).get("demo") === "1"
+  ? "review-backlog-forecast-demo"
+  : "review-backlog-forecast";
 const STORE = "records";
 const DB_VERSION = 1;
 

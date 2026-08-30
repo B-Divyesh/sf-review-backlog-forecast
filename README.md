@@ -2,6 +2,8 @@
 
 Review Backlog Forecast is a free, offline-capable planning utility for spaced-repetition learners returning to an overdue queue. It compares three recovery policies before the learner changes anything:
 
+Try the complete isolated sample at `/?demo=1`, or use **Try it with sample data** on the first screen. The demo opens a realistic 320-card backlog in its own browser database; it never reads or changes real plans.
+
 - **Steady** aims to halve an overdue queue in one week and clear it in two with a consistent allowance.
 - **Deadline** uses the spare capacity needed to meet a chosen date, or shows honestly when the date is out of reach.
 - **Gentle** ramps the overdue allowance over the first five sessions.
@@ -53,7 +55,7 @@ npm run build
 npm run test:e2e
 ```
 
-Unit tests cover policy distinction, the session cap, due-today priority, rollover visibility, validation, and both CSV import shapes. Playwright tests cover the real forecast path on desktop/mobile, CSV import, local persistence, offline reopening, 390px overflow, and Axe accessibility. The handoff records performance verification.
+Unit tests cover policy distinction, the session cap, due-today priority, rollover visibility, validation, and both CSV import shapes. Playwright tests cover the isolated demo and real forecast paths on desktop/mobile, CSV import, local persistence, offline reopening, 390px overflow, keyboard focus, touch targets, and Axe accessibility. The testable product claims are listed in `.factory/claims.json`; the sandbox is documented in `.factory/demo.md`.
 
 ## Privacy and architecture
 

@@ -21,6 +21,18 @@ const toast = $("#toast");
 const toastMessage = $("#toast-message");
 const toastAction = $<HTMLButtonElement>("#toast-action");
 const main = $("#main");
+const isDemo = new URLSearchParams(window.location.search).get("demo") === "1";
+
+const sampleInput: ForecastInput = {
+  overdue: 320,
+  dueToday: 48,
+  dailyDue: 36,
+  newCards: 0,
+  secondsPerCard: 12,
+  capMinutes: 30,
+  deadlineDays: 14,
+  studyDays: 6
+};
 
 let forecasts: PolicyForecast[] = [];
 let currentInput: ForecastInput | null = null;
@@ -206,7 +218,7 @@ form.addEventListener("submit", (event) => {
 });
 
 $("#load-example").addEventListener("click", () => {
-  populateForm({ overdue: 320, dueToday: 48, dailyDue: 36, newCards: 0, secondsPerCard: 12, capMinutes: 30, deadlineDays: 14, studyDays: 6 });
+  populateForm(sampleInput);
   importMessage.textContent = "Example loaded: 320 overdue cards with a 30-minute cap.";
   $("#overdue").focus();
 });
@@ -353,6 +365,25 @@ async function registerServiceWorker(): Promise<void> {
 
 async function init(): Promise<void> {
   try {
+    if (isDemo) {
+      $("#demo-banner").hidden = false;
+      populateForm(sampleInput);
+      renderForecast(sampleInput, false);
+      $("#reset-demo").addEventListener("click", async () => {
+        await storage.clearAll();
+        selectedPolicy = "steady";
+        populateForm(sampleInput);
+        renderForecast(sampleInput, false);
+        announce("Demo reset to the sample backlog.");
+      });
+      $("#start-real").addEventListener("click", async (event) => {
+        event.preventDefault();
+        await storage.clearAll();
+        window.location.assign("/");
+      });
+      registerServiceWorker().catch(() => { /* App remains usable without install support. */ });
+      return;
+    }
     await updateSavedStrip();
     const input = await storage.getInput();
     if (input && validateInput(input).length === 0) {

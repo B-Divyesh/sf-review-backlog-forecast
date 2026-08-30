@@ -23,10 +23,13 @@ describe("CSV import", () => {
     });
   });
 
-  it("rejects impossible calendar dates instead of normalizing them", () => {
-    expect(() => parseCardCsv("due_date,count\n2026-02-31,1\n", new Date("2026-02-27T12:00:00"))).toThrow(
-      "Due date on row 2 must be a real calendar date in YYYY-MM-DD format."
-    );
+  it("rejects each verifier-reported impossible calendar date instead of normalizing it", () => {
+    const today = new Date("2026-02-27T12:00:00");
+    for (const value of ["2026-02-31", "2026-13-01", "2026-00-00"]) {
+      expect(() => parseCardCsv(`due_date,count\n${value},1\n`, today)).toThrow(
+        "Due date on row 2 must be a real calendar date in YYYY-MM-DD format."
+      );
+    }
   });
 
   it("supports days_overdue and grouped counts", () => {

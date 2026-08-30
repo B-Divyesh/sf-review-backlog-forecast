@@ -21,7 +21,7 @@ describe("forecast simulation", () => {
     expect(forecasts[0].days.map((day) => day.overdueReviewed)).not.toEqual(forecasts[2].days.map((day) => day.overdueReviewed));
   });
 
-  it("never exceeds the hard session cap", () => {
+  it("@claim:hard-session-cap never exceeds the hard session cap", () => {
     for (const forecast of simulateAll(base)) {
       expect(Math.max(...forecast.days.map((day) => day.minutes))).toBeLessThanOrEqual(base.capMinutes);
       expect(Math.max(...forecast.days.map((day) => day.totalReviewed))).toBeLessThanOrEqual(150);
