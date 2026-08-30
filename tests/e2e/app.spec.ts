@@ -64,6 +64,68 @@ test("runs a forecast, selects a policy, and persists it", async ({ page }) => {
   expect(consoleErrors).toEqual([]);
 });
 
+test("invalidates stale forecast actions after edits, imports, and rejected submissions", async ({ page }) => {
+  await page.goto("/?demo=1");
+  const savePlan = page.getByRole("button", { name: "Use this plan" });
+  const exportPlan = page.getByRole("button", { name: "Export schedule" });
+  const staleNotice = page.locator("#forecast-status");
+
+  await expect(savePlan).toBeEnabled();
+  await expect(exportPlan).toBeEnabled();
+  await page.locator("#overdue").fill("500");
+  await expect(staleNotice).toContainText("This forecast is out of date");
+  await expect(savePlan).toBeDisabled();
+  await expect(exportPlan).toBeDisabled();
+
+  await page.getByRole("button", { name: "Run forecast" }).click();
+  await expect(savePlan).toBeEnabled();
+  await expect(exportPlan).toBeEnabled();
+  await page.locator("#queue-file").setInputFiles({
+    name: "replacement-summary.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from("overdue,due_today,daily_due\n125,31,22\n")
+  });
+  await expect(page.locator("#overdue")).toHaveValue("125");
+  await expect(staleNotice).toContainText("Run forecast before saving or exporting");
+  await expect(savePlan).toBeDisabled();
+  await expect(exportPlan).toBeDisabled();
+
+  await page.getByRole("button", { name: "Run forecast" }).click();
+  await expect(exportPlan).toBeEnabled();
+  await page.locator("#overdue").fill("-1");
+  await page.getByRole("button", { name: "Run forecast" }).click();
+  await expect(page.getByRole("alert")).toContainText("Overdue cards must be a whole number between 0 and 100,000.");
+  await expect(staleNotice).toContainText("This forecast is out of date");
+  await expect(savePlan).toBeDisabled();
+  await expect(exportPlan).toBeDisabled();
+});
+
+test("keeps focus on the selected policy radio through repeated arrow navigation", async ({ page }) => {
+  await page.goto("/?demo=1");
+  const steady = page.getByRole("radio", { name: /Steady/ });
+  const deadline = page.getByRole("radio", { name: /Deadline/ });
+  const gentle = page.getByRole("radio", { name: /Gentle/ });
+
+  await steady.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(deadline).toBeChecked();
+  await expect(deadline).toBeFocused();
+  await page.keyboard.press("ArrowRight");
+  await expect(gentle).toBeChecked();
+  await expect(gentle).toBeFocused();
+});
+
+test("keeps the transient Undo action at least 44px square on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/?demo=1");
+  await page.getByRole("button", { name: "Use this plan" }).click();
+  const undo = page.getByRole("button", { name: "Undo" });
+  await expect(undo).toBeVisible();
+  const box = await undo.boundingBox();
+  expect(box?.width).toBeGreaterThanOrEqual(44);
+  expect(box?.height).toBeGreaterThanOrEqual(44);
+});
+
 test("@claim:csv-import imports a summary CSV and reports the result", async ({ page }) => {
   await page.goto("/?demo=1");
   await page.locator("#queue-file").setInputFiles({
@@ -374,6 +436,7 @@ test("publishes route metadata, shared legal chrome, and build identity", async 
   await expect(page.locator('meta[property="og:image:width"]')).toHaveAttribute("content", "1200");
   await expect(page.locator('meta[property="og:image:height"]')).toHaveAttribute("content", "630");
   await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
+  await expect(page.locator(".trust-list")).toContainText("Free");
   await page.goto("/?demo=1");
   await expect(page).toHaveTitle("Demo — Review Backlog Forecast");
 
@@ -381,7 +444,20 @@ test("publishes route metadata, shared legal chrome, and build identity", async 
     await page.goto(route);
     await expect(page.getByRole("banner").getByRole("link", { name: "Review Backlog Forecast home" })).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
-    await expect(page.getByRole("contentinfo")).toContainText("Built by Param Factory · Build 1.0.3");
+    await expect(page.getByRole("contentinfo")).toContainText("Built by Param Factory · Build 1.0.4");
+  }
+  for (const [route, title, canonical] of [
+    ["/offline.html", "Offline — Review Backlog Forecast", "https://review-backlog-forecast.sociobot.in/offline.html"],
+    ["/404.html", "Page not found — Review Backlog Forecast", "https://review-backlog-forecast.sociobot.in/404.html"]
+  ]) {
+    await page.goto(route);
+    await expect(page).toHaveTitle(title);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", canonical);
+    await expect(page.locator('link[rel="manifest"]')).toHaveAttribute("href", "/manifest.webmanifest");
+    await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute("href", "/icons/icon-192.672eaa75.png");
+    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", canonical);
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", /recovery-console-social\.[a-f0-9]{8}\.jpg$/);
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
   }
   const social = await request.get("/assets/recovery-console-social.ddcbcf56.jpg");
   expect(social.status()).toBe(200);
@@ -417,7 +493,7 @@ test("activates a waiting service-worker update without losing the demo", async 
   cpSync("dist", fixture, { recursive: true });
   const workerPath = join(fixture, "sw.js");
   const originalWorker = readFileSync(workerPath, "utf8");
-  expect(originalWorker).toContain('const VERSION = "rbf-v1.0.3"');
+  expect(originalWorker).toContain('const VERSION = "rbf-v1.0.4"');
   const server = await startStaticServer(fixture);
   const context = await browser.newContext();
   const page = await context.newPage();
@@ -429,11 +505,11 @@ test("activates a waiting service-worker update without losing the demo", async 
         await new Promise<void>((resolve) => navigator.serviceWorker.addEventListener("controllerchange", () => resolve(), { once: true }));
       }
     });
-    writeFileSync(workerPath, originalWorker.replace("rbf-v1.0.3", "rbf-v1.0.4"));
+    writeFileSync(workerPath, originalWorker.replace("rbf-v1.0.4", "rbf-v1.0.5"));
     await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration())?.update(); });
     await expect(page.getByText("A new version is ready.")).toBeVisible();
     await page.getByRole("button", { name: "Update" }).click();
-    await page.waitForFunction(async () => (await caches.keys()).includes("rbf-v1.0.4-shell"));
+    await page.waitForFunction(async () => (await caches.keys()).includes("rbf-v1.0.5-shell"));
     await expect(page.getByRole("heading", { name: "Three honest routes through the queue" })).toBeVisible();
   } finally {
     await context.close();

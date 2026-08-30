@@ -21,6 +21,9 @@ const toast = $("#toast");
 const toastMessage = $("#toast-message");
 const toastAction = $<HTMLButtonElement>("#toast-action");
 const main = $("#main");
+const savePlanButton = $<HTMLButtonElement>("#save-plan");
+const exportPlanButton = $<HTMLButtonElement>("#export-plan");
+const forecastStatus = $("#forecast-status");
 const isDemo = new URLSearchParams(window.location.search).get("demo") === "1";
 
 const sampleInput: ForecastInput = {
@@ -39,6 +42,7 @@ let currentInput: ForecastInput | null = null;
 let selectedPolicy: PolicyId = "steady";
 let savedPlan: SavedPlan | undefined;
 let toastTimer = 0;
+let forecastStale = false;
 
 document.querySelector<HTMLAnchorElement>(".skip-link")?.addEventListener("click", (event) => {
   event.preventDefault();
@@ -96,6 +100,24 @@ function populateForm(input: ForecastInput): void {
   }
 }
 
+function setForecastActionsEnabled(enabled: boolean): void {
+  savePlanButton.disabled = !enabled;
+  exportPlanButton.disabled = !enabled;
+}
+
+function hasCurrentForecast(): boolean {
+  return Boolean(currentInput && forecasts.length > 0 && !forecastStale);
+}
+
+function markForecastStale(): void {
+  if (!currentInput || results.hidden || forecastStale) return;
+  forecastStale = true;
+  results.classList.add("is-stale");
+  forecastStatus.hidden = false;
+  forecastStatus.textContent = "This forecast is out of date. Run forecast before saving or exporting a schedule.";
+  setForecastActionsEnabled(false);
+}
+
 function showErrors(errors: string[]): void {
   errorSummary.innerHTML = `<p><b>Check ${errors.length === 1 ? "this value" : "these values"}:</b></p><ul>${errors.map((error) => `<li>${error}</li>`).join("")}</ul>`;
   errorSummary.hidden = false;
@@ -113,6 +135,8 @@ function finishLabel(forecast: PolicyForecast): string {
 }
 
 function renderPolicies(): void {
+  const restorePolicyFocus = document.activeElement instanceof HTMLInputElement
+    && document.activeElement.name === "policy";
   $("#policy-grid").innerHTML = forecasts.map((forecast) => {
     const status = forecast.onTarget ? "On target" : "Runs long";
     const half = forecast.halfwayDay ? `Half by day ${forecast.halfwayDay}` : "Under half not reached";
@@ -132,6 +156,9 @@ function renderPolicies(): void {
       renderDetail();
     });
   });
+  if (restorePolicyFocus) {
+    document.querySelector<HTMLInputElement>(`input[name="policy"][value="${selectedPolicy}"]`)?.focus({ preventScroll: true });
+  }
 }
 
 function renderDetail(): void {
@@ -184,9 +211,14 @@ function renderDetail(): void {
 function renderForecast(input: ForecastInput, focusResults = true): void {
   currentInput = input;
   forecasts = simulateAll(input);
+  forecastStale = false;
   results.hidden = false;
+  results.classList.remove("is-stale");
   emptyState.hidden = true;
   errorSummary.hidden = true;
+  forecastStatus.hidden = true;
+  forecastStatus.textContent = "";
+  setForecastActionsEnabled(true);
   const capacity = Math.floor((input.capMinutes * 60) / input.secondsPerCard);
   $("#capacity-readout").innerHTML = `<b>${capacity} cards</b> fit inside the ${input.capMinutes}-minute cap at ${input.secondsPerCard} seconds each.`;
   renderPolicies();
@@ -211,14 +243,21 @@ form.addEventListener("submit", (event) => {
   form.classList.add("was-validated");
   const input = readInput();
   const errors = validateInput(input);
-  if (errors.length > 0) return showErrors(errors);
+  if (errors.length > 0) {
+    markForecastStale();
+    return showErrors(errors);
+  }
   form.classList.remove("was-validated");
   renderForecast(input);
   storage.saveInput(input).catch(() => announce("The forecast works, but this browser could not save your inputs."));
 });
 
+form.addEventListener("input", markForecastStale);
+form.addEventListener("change", markForecastStale);
+
 $("#load-example").addEventListener("click", () => {
   populateForm(sampleInput);
+  markForecastStale();
   importMessage.textContent = "Example loaded: 320 overdue cards with a 30-minute cap.";
   $("#overdue").focus();
 });
@@ -245,12 +284,14 @@ queueFile.addEventListener("change", async () => {
         await storage.savePlan(backup.plan);
       }
       await updateSavedStrip();
+      markForecastStale();
       importMessage.textContent = "Local backup restored. Run the forecast to review it.";
     } else {
       const summary = parseCardCsv(contents);
       ($<HTMLInputElement>("#overdue")).value = String(summary.overdue);
       ($<HTMLInputElement>("#due-today")).value = String(summary.dueToday);
       if (summary.dailyDue !== undefined) ($<HTMLInputElement>("#daily-due")).value = String(summary.dailyDue);
+      markForecastStale();
       importMessage.textContent = `Read ${summary.rowCount.toLocaleString()} ${summary.source === "summary" ? "summary row" : "card rows"}: ${summary.overdue.toLocaleString()} overdue and ${summary.dueToday.toLocaleString()} due today.${summary.dailyDue !== undefined ? ` Daily due estimate set to ${summary.dailyDue}.` : " Add your usual daily due estimate."}`;
       $("#overdue").focus();
     }
@@ -263,8 +304,11 @@ queueFile.addEventListener("change", async () => {
 
 $("#download-template").addEventListener("click", () => download("review-backlog-template.csv", SUMMARY_TEMPLATE, "text/csv"));
 
-$("#save-plan").addEventListener("click", async () => {
-  if (!currentInput) return;
+savePlanButton.addEventListener("click", async () => {
+  if (!hasCurrentForecast() || !currentInput) {
+    announce("Run the forecast again before saving this plan.");
+    return;
+  }
   const previous = savedPlan;
   const plan: SavedPlan = { id: crypto.randomUUID(), savedAt: new Date().toISOString(), input: currentInput, policy: selectedPolicy };
   await storage.savePlan(plan);
@@ -292,7 +336,11 @@ $("#remove-saved").addEventListener("click", async () => {
   announce("Saved plan removed.");
 });
 
-$("#export-plan").addEventListener("click", () => {
+exportPlanButton.addEventListener("click", () => {
+  if (!hasCurrentForecast()) {
+    announce("Run the forecast again before exporting a schedule.");
+    return;
+  }
   const forecast = forecasts.find((item) => item.id === selectedPolicy);
   if (!forecast) return;
   const rows = ["day,date,study_day,regular_reviewed,overdue_reviewed,total,minutes,overdue_remaining,regular_rollover"];
@@ -315,6 +363,10 @@ $("#clear-data").addEventListener("click", async () => {
   savedPlan = undefined;
   savedStrip.hidden = true;
   form.reset();
+  currentInput = null;
+  forecasts = [];
+  forecastStale = false;
+  setForecastActionsEnabled(false);
   results.hidden = true;
   emptyState.hidden = false;
   announce("All local forecast data cleared.");

@@ -10,6 +10,7 @@ Reviewed 2026-08-30. The landing page uses **queue** for the learner's review qu
 | Preview only. | 2 | Pass |
 | Stays on this device. | 5 | Pass |
 | No Anki access. | 3 | Pass |
+| Free. | 1 | Pass |
 | Import card due dates or a one-row summary. | 9 | Pass |
 | The file is read in this browser and never uploaded. | 10 | Pass |
 | Safe by design: this forecasts counts only. | 7 | Pass |

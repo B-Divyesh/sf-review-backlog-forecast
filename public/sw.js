@@ -1,4 +1,4 @@
-const VERSION = "rbf-v1.0.3";
+const VERSION = "rbf-v1.0.4";
 const SHELL_CACHE = `${VERSION}-shell`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 const SHELL = ["/"]; // BUILD_INJECT_SHELL

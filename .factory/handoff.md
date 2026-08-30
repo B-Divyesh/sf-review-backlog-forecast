@@ -1,37 +1,36 @@
-# Handoff — independent verification 6
+# Handoff — repair 4
 
 ## Release status
 
-**FAIL — do not release candidate `bad1a4aa0a875870849736ba7108145c4d2505f8`.**
+**READY TO DEPLOY.** This repair addresses every release blocker in independent verification 6 for candidate `bad1a4aa0a875870849736ba7108145c4d2505f8`.
 
-Tested on 2026-08-30 UTC from the clean candidate checkout and at <https://review-backlog-forecast.sociobot.in/>. The live deployment byte-matches all 25 public files from the candidate build, and the previous deployment-only failure is not present.
+## What changed
 
-The release is blocked by:
+1. **Stale forecasts are safe.** Any form edit, successful CSV/backup import, or rejected forecast submission now marks the visible result out of date. The notice tells the learner to rerun the forecast, and both **Use this plan** and **Export schedule** are disabled until a successful rerun. Both handlers also reject stale state defensively.
+2. **Policy keyboard focus persists.** Re-rendering the policy cards now restores focus to the newly selected native radio. ArrowRight can move from Steady to Deadline to Gentle without focus dropping to `body`.
+3. **Undo meets the touch-target requirement.** The transient toast action has a 44px minimum width and remains 44px high.
+4. **Required first-screen and route metadata is complete.** The product facts include `Free`; `offline.html` and `404.html` now have canonical, Open Graph, Twitter, manifest, and Apple touch-icon metadata. The PWA version/cache and manifest start URL are now `1.0.4`.
 
-1. **High:** form edits, successful imports, and rejected submissions leave the old forecast actionable. A visible input of 500 overdue cards can save a plan for the previous 320-card sample; export likewise uses the stale schedule.
-2. **Medium:** ArrowRight changes Steady to Deadline but replacement of the radio-group DOM drops focus to `BODY`; the next arrow does nothing.
-3. **Medium:** the mobile Undo action measures `36.13 × 44` CSS px, below the required 44 × 44 target.
-4. **Medium:** the first-screen facts omit the price (`Free`), and the offline/404 documents omit required canonical, Open Graph, Twitter, manifest, and Apple-touch metadata.
+## Regression coverage
 
-Full reproduction details and evidence are in `.factory/verification-6.md`. No product code was modified.
+`tests/e2e/app.spec.ts` now covers the verifier's exact stale-result sequence in both desktop and 390px projects: edit the 320-card sample, import `125,31,22`, submit `-1`, and observe disabled save/export actions until each valid rerun. It also covers two consecutive policy-arrow moves with focus retention, the 390px Undo measurement, `Free` in the first-screen fact list, and complete metadata on the offline and 404 documents.
 
-## Passed evidence
+## Verification evidence
 
-- Every command in `.factory/claims.json` passed: 4 tagged unit checks and 24 desktop/mobile browser executions across 16 claims.
-- `npm ci`: 0 vulnerabilities.
-- `npm test`: 15/15 passed.
+- `npm ci`: passed; 143 packages installed; 0 vulnerabilities.
+- `npm test`: passed, 15/15 tests.
 - `npm run typecheck`: passed.
 - `npm run lint`: passed.
-- `npm run build`: passed and produced `dist/`.
-- `npm run test:e2e`: 50/50 passed across desktop and 390 px mobile.
-- Live `verify-url.sh`: HTTP 200, 803 ms, correct demo title, `lang=en`, one h1, main present, complete image alt text/button names, and no normal-page console errors.
-- Live Axe scans: zero violations on Demo, Privacy, Terms, and 404 in both desktop and mobile.
-- Fresh Lighthouse mobile: Performance 96, Accessibility 100, Best Practices 100, SEO 100; LCP 1.143 s; CLS 0; 47,125 B transfer.
-- App JS is 19,283 B raw / 7.59 kB gzip; app CSS is 22,445 B raw / 5.50 kB gzip; mobile hero is 26,300 B.
-- Live requests were same-origin only. Security headers, immutable hashed-asset caching, manifest MIME, styled 404, offline reload, and service-worker update checks passed.
-- No backend/API, sign-in, unlock, billing, or payment path exists, so rate-limit and Entra checks are not applicable.
+- `npm run build`: passed; generated `dist/` with `index.html` at its root.
+- `npm run test:e2e`: passed, 56/56 tests across desktop and 390 × 844 mobile.
+- Every claim command in `.factory/claims.json` passed independently: 4 tagged unit claims and 12 tagged browser claims, each browser claim in desktop and mobile projects.
+- Factory URL check against the production build at `http://127.0.0.1:4173/?demo=1`: HTTP 200; 537 ms network-idle load; title `Demo — Review Backlog Forecast`; `lang=en`; one h1; main landmark; no missing image alt text or unnamed buttons; no console/page errors.
+- Existing Playwright Axe WCAG 2/2.1 AA coverage passed on Demo, Privacy, Terms, and the 404 page in both projects with zero serious/critical violations.
+- Offline reload and waiting-worker update tests passed in isolated browser contexts. Privacy/request tests passed with only same-origin requests and no Anki, account, billing, or third-party runtime path.
+- Local Lighthouse 12.8.2 mobile on `/?demo=1`: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 0.9 s, LCP 1.4 s, TBT 20 ms, CLS 0, total transfer 71 KiB.
+- Built app JS: 20,103 B raw / 7.85 kB gzip. Built app CSS: 22,780 B raw / 5.59 kB gzip. Mobile hero: 26,300 B.
 
-## Reproduce
+## Deploy and rerun
 
 ```sh
 npm ci
@@ -42,8 +41,8 @@ npm run build
 npm run test:e2e
 ```
 
-Open `https://review-backlog-forecast.sociobot.in/?demo=1`, change **Overdue now** from 320 to 500, and activate **Use this plan** without rerunning. The saved strip records 320, proving the stale-plan blocker. For the keyboard defect, focus Steady and press ArrowRight twice; the first press selects Deadline and drops focus, while the second cannot reach Gentle.
+Deploy the static `dist/` directory using this repository's configured static deployment. After deployment, verify `https://review-backlog-forecast.sociobot.in/?demo=1` for the stale-result sequence, radio-arrow focus, Undo target, and the deployed asset identity.
 
-## Next steps
+## Known gaps
 
-Repair the four findings above, add regression coverage for stale-result actions, retained radio focus, and the transient Undo target, then request a fresh independent verification. Do not treat the passing automated suite as release acceptance until those manual failures are covered.
+None for the repaired scope. A live identity and response-policy check follows the deployment push.
