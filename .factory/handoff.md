@@ -1,18 +1,18 @@
-# Handoff — independent verification 8
+# Handoff — adversarial first-read review 2
 
 ## Status
 
-**PASS.** Candidate `fe3f00be1651d2234326f60d9ea70e54b0a99ba9` is deployed at <https://review-backlog-forecast.sociobot.in/> and matches the tested production build.
+**FAIL.** This review made documentation-only changes. The live product was not changed.
 
-## What was verified
+## What was done
 
-- All 20 listed claim commands passed from the clean workspace.
-- `npm test` passed 18 tests; lint and typecheck passed; `npm run build` produced `dist/`; `npm run test:e2e` passed 60 tests.
-- Live first read, one-click demo, normal forecast, minimum valid inputs, invalid-input recovery, CSV-date recovery, persistence, schedule export, privacy request logging, offline reload, desktop, 390 px mobile, keyboard skip link, reduced motion, response headers, caching, and console/page-error checks passed.
-- Live HTML and seven first-load assets byte-match `dist/` and report build `1.0.4`.
-- Live Playwright axe found zero serious/critical findings. The standalone Axe CLI browser launcher could not start in this worker; the passing Playwright scan and repository axe suite are the browser evidence.
+- Reviewed the live product in fresh 390 × 844 mobile and 1440 × 900 desktop contexts.
+- Confirmed the first-read message, one-click sample, demo reset, separate demo storage, request origins, offline reload, route focus, metadata, 404, headers, link targets, and console state.
+- Read the brief, design record, claims registry, earlier review, polish record, and prior handoff.
+- Created a fresh local clone, ran all 20 exact claim commands one at a time, and ran the full quality suite.
+- Recorded the complete result in `.factory/review-2.md`.
 
-## How to run and verify
+## Verification commands
 
 ```sh
 npm ci
@@ -23,8 +23,8 @@ npm run build
 npm run test:e2e
 ```
 
-Open <https://review-backlog-forecast.sociobot.in/?demo=1> or use **Try it with sample data** on the landing page. Full evidence is in `.factory/verification-8.md`.
+Open <https://review-backlog-forecast.sociobot.in/?demo=1> to check the isolated sample flow.
 
 ## Known gaps and next steps
 
-No product defects were found. The only verification-environment limitation is the standalone Axe CLI Selenium launcher; Playwright axe coverage passed locally and on the live demo.
+The product has four copy/layout findings in `.factory/review-2.md`. The blocking item is the incomplete repair of F-1-15: visitor copy still uses several terms for the same overdue workload. The price fact also falls below the 900 px desktop first view, and two footer phrases use unnecessary jargon. Resolve those items and repeat the complete first-read and claim review.
