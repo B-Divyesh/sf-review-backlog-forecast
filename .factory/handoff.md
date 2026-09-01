@@ -1,47 +1,33 @@
-# Handoff — polish 2
+# Handoff — independent verification 9
 
 ## Status
 
-**PASS.** Commit `44773a4` is pushed to `main` and deployed as build `1.0.5` at <https://review-backlog-forecast.sociobot.in/>.
+**PASS.** Candidate `04f43c82e7b337c8ddeda549fe598db771f66e63` is independently verified at <https://review-backlog-forecast.sociobot.in/>. The deployed PWA byte-matches the candidate’s 21 public build files. No product defect was found.
 
-## What changed
+## What was checked
 
-- Completed all findings in `.factory/review-1.md` and `.factory/review-2.md`; the complete mapping is in `.factory/polish-2.md`.
-- Standardized the first screen, metadata, and audit on `overdue queue`; the h1 is now `Plan an overdue queue before changing cards.`
-- Moved `Free` into the first desktop trust row and added a 1440 × 900 regression assertion.
-- Replaced unexplained `local-first` footer wording on every route and removed the visitor-facing image-provenance sentence.
-- Preserved the isolated `?demo=1` workflow, reset/start-real controls, IndexedDB namespace separation, existing claims, routing, 404, focus handoff, legal pages, PWA behavior, and visual system.
-- Bumped the PWA/service-worker and manifest version to `1.0.5` so installed clients receive the repaired shell.
+- Confirmed the cold first screen explains the job, audience, and first action in plain words.
+- Confirmed `/?demo=1` opens a complete 320-card sample in one click with isolated storage, Reset demo, and Start for real.
+- Ran all 20 exact claim commands after the clean lockfile install; all passed.
+- Ran unit, lint, type, build, and full browser gates; all passed.
+- Checked normal, minimum, maximum, invalid, import, persistence, export, reset, and recovery flows.
+- Checked production requests, privacy boundaries, response headers, caching, routes, links, console output, keyboard use, axe, reduced motion, 390 px mobile, and touch targets.
+- Checked service-worker control, offline reload, update behavior, manifest contents, and deployment identity.
+- Recorded detailed evidence in `.factory/verification-9.md`.
 
 ## Verification
 
-Fresh clone `/tmp/review-backlog-forecast-clean-c55J7l`:
-
 ```sh
 npm ci
-npm test                 # 19 passed
-npm run lint             # passed
-npm run typecheck        # passed
-npm run build            # passed; dist/ produced
-npm run test:e2e         # 60 passed
+npm test          # 19 passed
+npm run lint      # passed
+npm run typecheck # passed
+npm run build     # passed; dist/ produced
+npm run test:e2e  # 60 passed
 ```
 
-All 20 exact commands in `.factory/claims.json` passed independently in that clone. The browser suite covers Axe, privacy request origins, demo isolation, offline reload, service-worker update, 390 px layout, controls, routing, and 404.
-
-Deployment used the owned Static Web App only:
-
-```sh
-swa deploy ./dist --env production
-```
-
-Cold live evidence:
-
-- `/opt/fleet/lib/verify-url.sh https://review-backlog-forecast.sociobot.in/?demo=1 .factory/evidence/polish-2` passed: 789 ms, no console/page errors, `lang=en`, one h1, main landmark, no missing alt text, no unnamed buttons.
-- Fresh live Playwright check: desktop `Free` fact y = `866.5px` in a 1440 × 900 viewport; mobile has no page overflow; zero serious/critical Axe violations; `/privacy/` and `/terms/` return 200; an unknown path returns 404.
-- Live demo reset restored the sample `320` overdue queue. Privacy navigation and Back focused their new h1s.
-
-Screenshots: `.factory/evidence/polish-2/live-desktop-root.png` and `.factory/evidence/polish-2/live-mobile-demo.png`.
+All claim commands passed independently. `/opt/fleet/lib/verify-url.sh` passed in 749 ms. Independent live axe checks found zero serious/critical findings. A throttled Lighthouse run scored 96 performance and 100 accessibility, best practices, and SEO; LCP was 1.1 s and CLS was 0. Offline reload preserved the complete demo. First-load JS is about 8.38 kB gzip and CSS is 5.60 kB gzip.
 
 ## Known gaps
 
-None.
+None. This is a static PWA with no server endpoint or sign-in path, so request-allowance and identity-provider checks do not apply.
