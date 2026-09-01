@@ -27,6 +27,7 @@
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to forecast controls</a>
+    <p class="visually-hidden" id="route-announcement" role="status" aria-live="polite"></p>
     <header class="site-header">
       <a class="wordmark" href="/" aria-label="Review Backlog Forecast home">
         <span class="wordmark-mark" aria-hidden="true"><i></i><i></i><i></i></span>
@@ -49,10 +50,10 @@
       </section>
       <section class="hero" aria-labelledby="page-title">
         <div class="hero-copy">
-          <p class="eyebrow">A recovery console for spaced repetition</p>
+          <p class="eyebrow">Plan a spaced-repetition review backlog.</p>
           <h1 id="page-title">Plan overdue reviews before changing cards.</h1>
           <p class="lede">For learners returning after missed days, compare capped recovery plans before changing an Anki queue.</p>
-          <p class="hero-action"><a class="button button-primary" href="/?demo=1">Try it with sample data <span aria-hidden="true">→</span></a><span>See a 320-card backlog plan. Nothing real is saved.</span></p>
+          <p class="hero-action"><a class="button button-primary" href="/?demo=1">Try it with sample data <span aria-hidden="true">→</span></a><span>See a 320-card overdue queue plan. Nothing real is saved.</span></p>
           <ul class="trust-list" aria-label="Product promises">
             <li>Preview only</li>
             <li>Stays on this device</li>
@@ -65,7 +66,7 @@
             <source media="(max-width: 720px)" srcset="/assets/recovery-console-720.b5e3dd0a.webp" type="image/webp">
             <img src="/assets/recovery-console-1200.b0305754.webp" srcset="/assets/recovery-console-720.b5e3dd0a.webp 720w, /assets/recovery-console-1200.b0305754.webp 1200w" sizes="(max-width: 840px) 100vw, 52vw" width="1200" height="800" alt="A sea-green planning instrument with three paper tracks and a red forecast needle" decoding="async" fetchpriority="high">
           </picture>
-          <figcaption>Three ways through the same queue. Nothing is rescheduled here.</figcaption>
+          <figcaption>Compare three recovery plans. Nothing is rescheduled here.</figcaption>
         </figure>
       </section>
 
@@ -83,15 +84,15 @@
 
       <section class="planner" aria-labelledby="planner-title">
         <div class="section-heading">
-          <p class="eyebrow">Set the dials</p>
-          <h2 id="planner-title">Describe your queue</h2>
-          <p>Use totals, or import a simple CSV. Estimates are clearly marked and adjustable.</p>
+          <p class="eyebrow">Forecast inputs</p>
+          <h2 id="planner-title">Describe your overdue queue</h2>
+          <p>Use totals, or import a simple CSV. Labels mark each estimate. You can edit it before running a forecast.</p>
         </div>
 
         <div class="import-panel">
           <div>
             <span class="step-number" aria-hidden="true">01</span>
-            <h3>Bring the count</h3>
+            <h3>Import queue totals</h3>
             <p>Import card due dates or a one-row summary. The file is read in this browser and never uploaded.</p>
           </div>
           <div class="import-actions">
@@ -149,7 +150,7 @@
             </label>
           </div>
           <div class="form-submit">
-            <p><b>Safe by design:</b> this forecasts counts only. It cannot read or change your Anki collection.</p>
+            <p><b>Preview only:</b> this forecasts counts only. It cannot read or change your Anki collection.</p>
             <button class="button button-primary" type="submit"><span>Run forecast</span><span aria-hidden="true">→</span></button>
           </div>
         </form>
@@ -158,21 +159,21 @@
       <section class="results" id="results" aria-labelledby="results-title" hidden>
         <div class="section-heading results-heading">
           <div>
-            <p class="eyebrow">Compare the channels</p>
-            <h2 id="results-title">Three honest routes through the queue</h2>
+            <p class="eyebrow">Compare recovery plans</p>
+            <h2 id="results-title">Three recovery plans</h2>
           </div>
           <p id="capacity-readout" class="capacity-readout"></p>
         </div>
         <p class="forecast-status" id="forecast-status" role="status" aria-live="polite" hidden></p>
         <fieldset class="policy-fieldset">
-          <legend class="visually-hidden">Choose a recovery policy</legend>
+          <legend class="visually-hidden">Choose a recovery plan</legend>
           <div class="policy-grid" id="policy-grid"></div>
         </fieldset>
 
         <article class="plan-detail" aria-labelledby="detail-title">
           <header class="detail-header">
             <div>
-              <p class="eyebrow">Selected channel</p>
+              <p class="eyebrow">Selected recovery plan</p>
               <h2 id="detail-title"></h2>
               <p id="detail-description"></p>
             </div>
@@ -203,13 +204,13 @@
 
           <div class="assumptions" id="guide">
             <div>
-              <p class="eyebrow">Read the fine print</p>
+              <p class="eyebrow">Forecast assumptions</p>
               <h3>What moves cards in this forecast</h3>
             </div>
             <ol>
               <li><b>Today stays in the plan.</b> Due-today and estimated normal reviews get capacity before overdue cards.</li>
               <li><b>One pace for every card.</b> Minutes are card count × your seconds-per-review estimate.</li>
-              <li><b>Rest days add regular work.</b> Unreviewed normal cards roll forward and stay visible.</li>
+              <li><b>Rest days add regular reviews.</b> Unreviewed regular reviews roll forward and stay visible.</li>
               <li><b>Anki scheduling is not simulated.</b> Future intervals, retention, lapses, and FSRS changes remain unknown.</li>
             </ol>
           </div>
@@ -219,8 +220,8 @@
       <section class="empty-state" id="empty-state" aria-labelledby="empty-title">
         <span class="empty-dial" aria-hidden="true"></span>
         <div>
-          <p class="eyebrow">Forecast tape is blank</p>
-          <h2 id="empty-title">Add your queue totals to compare plans.</h2>
+          <p class="eyebrow">No forecast yet</p>
+          <h2 id="empty-title">Add your overdue queue totals to compare recovery plans.</h2>
           <p>You can change every assumption and rerun as often as you need. No card is ever moved.</p>
         </div>
       </section>

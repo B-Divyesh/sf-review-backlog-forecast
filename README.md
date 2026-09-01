@@ -1,20 +1,20 @@
 # Review Backlog Forecast
 
-Review Backlog Forecast is a free planning utility for spaced-repetition learners returning to an overdue queue. It compares three recovery policies before the learner changes anything.
+Review Backlog Forecast is a free planning utility for spaced-repetition learners returning to an overdue queue. It compares three recovery plans before the learner changes anything.
 
-Try the complete sample at `/?demo=1`, or use **Try it with sample data** on the first screen. The demo opens a realistic 320-card backlog in its own browser database. It never reads or changes real plans.
+Try the complete sample at `/?demo=1`, or use **Try it with sample data** on the first screen. The demo opens a 320-card overdue queue in its own browser database. It never reads or changes real plans.
 
-- **Steady** aims to halve an overdue queue in one week and clear it in two with a consistent allowance.
-- **Deadline** uses the spare capacity needed to meet a chosen date, or shows honestly when the date is out of reach.
-- **Gentle** ramps the overdue allowance over the first five sessions.
+- **Steady** uses the same overdue allowance each study session. The sample halves the overdue queue in one week and clears it in two.
+- **Deadline** uses spare capacity for your chosen finish date. It says when the deadline cannot fit within your cap.
+- **Gentle** starts at half the Steady allowance. It reaches the full allowance after five study sessions.
 
-Every plan protects due-today and estimated normal cards first. It shows cards and minutes, exposes regular-work rollover, and enforces the session cap. The app does not connect to Anki or reschedule cards.
+Every recovery plan protects due-today and estimated regular reviews first. It shows cards and minutes, exposes regular-review rollover, and enforces the session cap. The app does not connect to Anki or reschedule cards.
 
 Production URL: <https://review-backlog-forecast.sociobot.in>
 
 ## Who it is for
 
-People coming back to Anki or another spaced-repetition system after missed days who need a comprehensible recovery plan—not another opaque review button.
+For people returning to Anki after missed days who need a clear recovery plan.
 
 ## Import formats
 
@@ -25,7 +25,7 @@ overdue,due_today,daily_due
 320,48,36
 ```
 
-It also accepts grouped rows with `due_date` (`YYYY-MM-DD`) or `days_overdue`, plus optional `count` or `quantity`. Future rows produce an editable normal-due estimate. The browser does not upload or retain raw card content.
+It also accepts grouped rows with `due_date` (`YYYY-MM-DD`) or `days_overdue`, plus optional `count` or `quantity`. The browser does not upload or retain raw card content.
 
 The footer exports a JSON backup of local settings and the chosen plan. The import control restores that backup. The selected daily schedule exports as CSV for reference. Schedule CSVs are not Anki rescheduling files.
 
@@ -56,7 +56,7 @@ npm run lint
 npm run test:e2e
 ```
 
-`npm run test:e2e` builds the production app before starting Playwright. The suite covers desktop and 390px mobile layouts, keyboard use, Axe checks, privacy, persistence, exports, offline reopening, update handling, metadata, HTTP 404 behavior, touch targets, and delayed-start CLS. Every visitor-facing product claim and its exact test command is listed in `.factory/claims.json`. The isolated test data is documented in `.factory/demo.md`.
+`npm run test:e2e` builds the production app before starting Playwright. The suite checks desktop and 390px mobile layouts, keyboard use, accessibility, privacy, persistence, and exports. It also checks offline reopening, updates, metadata, 404 behavior, touch targets, and startup layout shift. Every visitor-facing product claim and its exact test command is listed in `.factory/claims.json`. The isolated test data is documented in `.factory/demo.md`.
 
 ## Privacy and architecture
 

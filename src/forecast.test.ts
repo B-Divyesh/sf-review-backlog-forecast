@@ -47,6 +47,31 @@ describe("forecast simulation", () => {
     expect(forecast.onTarget).toBe(false);
   });
 
+  it("@claim:steady-recovery-target makes the sample halve within one week and clear within two", () => {
+    const forecast = simulatePolicy(base, "steady", new Date("2026-08-27T12:00:00"));
+    const firstWeek = forecast.days.filter((day) => day.index <= 7).at(-1);
+    expect(firstWeek?.overdueRemaining).toBeLessThanOrEqual(base.overdue / 2);
+    expect(forecast.finishDay).toBeLessThanOrEqual(14);
+    expect(forecast.onTarget).toBe(true);
+  });
+
+  it("@claim:deadline-feasibility identifies both a reachable and unreachable deadline", () => {
+    const reachable = simulatePolicy(base, "deadline", new Date("2026-08-27T12:00:00"));
+    const unreachable = simulatePolicy({ ...base, dueToday: 150, dailyDue: 150 }, "deadline", new Date("2026-08-27T12:00:00"));
+    expect(reachable.finishDay).toBeLessThanOrEqual(base.deadlineDays);
+    expect(reachable.onTarget).toBe(true);
+    expect(unreachable.finishDay).toBeNull();
+    expect(unreachable.onTarget).toBe(false);
+  });
+
+  it("@claim:gentle-ramp uses half, then three-quarter, then full allowance over five study sessions", () => {
+    const steady = simulatePolicy(base, "steady", new Date("2026-08-27T12:00:00"));
+    const gentle = simulatePolicy(base, "gentle", new Date("2026-08-27T12:00:00"));
+    const steadyAllowance = steady.days.find((day) => day.studyDay)?.overdueReviewed;
+    const ramp = gentle.days.filter((day) => day.studyDay).slice(0, 6).map((day) => day.overdueReviewed);
+    expect(ramp).toEqual([14, 14, 21, 21, 21, steadyAllowance]);
+  });
+
   it("marks an achievable steady plan on target", () => {
     const forecast = simulatePolicy(base, "steady", new Date("2026-08-27T12:00:00"));
     expect(forecast.finishDay).toBeLessThanOrEqual(14);

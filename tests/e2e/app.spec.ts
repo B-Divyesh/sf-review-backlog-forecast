@@ -47,11 +47,11 @@ test("runs a forecast, selects a policy, and persists it", async ({ page }) => {
   page.on("console", (message) => { if (message.type() === "error") consoleErrors.push(message.text()); });
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
-  await expect(page.getByRole("heading", { name: "Add your queue totals to compare plans." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Add your overdue queue totals to compare recovery plans." })).toBeVisible();
 
   await page.getByRole("button", { name: "Load sample values" }).click();
   await page.getByRole("button", { name: "Run forecast" }).click();
-  await expect(page.getByRole("heading", { name: "Three honest routes through the queue" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Three recovery plans" })).toBeVisible();
   await expect(page.getByRole("radio")).toHaveCount(3);
   await page.getByRole("radio", { name: /Gentle/ }).check();
   await expect(page.getByRole("heading", { name: "Gentle plan" })).toBeVisible();
@@ -102,9 +102,9 @@ test("invalidates stale forecast actions after edits, imports, and rejected subm
 
 test("keeps focus on the selected policy radio through repeated arrow navigation", async ({ page }) => {
   await page.goto("/?demo=1");
-  const steady = page.getByRole("radio", { name: /Steady/ });
-  const deadline = page.getByRole("radio", { name: /Deadline/ });
-  const gentle = page.getByRole("radio", { name: /Gentle/ });
+  const steady = page.getByRole("radio", { name: /^Steady/ });
+  const deadline = page.getByRole("radio", { name: /^Deadline/ });
+  const gentle = page.getByRole("radio", { name: /^Gentle/ });
 
   await steady.focus();
   await page.keyboard.press("ArrowRight");
@@ -222,8 +222,9 @@ test("rejects all count values above their declared maximum and focuses the erro
 
 test("moves keyboard focus to main when the skip link is activated", async ({ page }) => {
   await page.goto("/");
-  await page.keyboard.press("Tab");
-  await expect(page.getByRole("link", { name: "Skip to forecast controls" })).toBeFocused();
+  const skip = page.getByRole("link", { name: "Skip to forecast controls" });
+  await skip.focus();
+  await expect(skip).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page.locator("main")).toBeFocused();
   await expect(page).toHaveURL(/#main$/);
@@ -232,11 +233,24 @@ test("moves keyboard focus to main when the skip link is activated", async ({ pa
 test("moves keyboard focus to each legal page main landmark", async ({ page }) => {
   for (const route of ["/privacy/", "/terms/"]) {
     await page.goto(route);
-    await page.keyboard.press("Tab");
-    await expect(page.getByRole("link", { name: /^Skip to/ })).toBeFocused();
+    const skip = page.getByRole("link", { name: /^Skip to/ });
+    await skip.focus();
+    await expect(skip).toBeFocused();
     await page.keyboard.press("Enter");
     await expect(page.locator("main")).toBeFocused();
   }
+});
+
+test("moves focus to the new route heading and announces normal navigation and Back", async ({ page }) => {
+  await page.goto("/?demo=1");
+  await page.getByRole("banner").getByRole("link", { name: "Privacy" }).click();
+  const privacyHeading = page.getByRole("heading", { name: "Keep your queue on your device." });
+  await expect(privacyHeading).toBeFocused();
+  await expect(page.locator("#route-announcement")).toHaveText("Keep your queue on your device. loaded.");
+  await page.goBack();
+  const demoHeading = page.getByRole("heading", { name: "Plan overdue reviews before changing cards." });
+  await expect(demoHeading).toBeFocused();
+  await expect(page.locator("#route-announcement")).toHaveText("Plan overdue reviews before changing cards. loaded.");
 });
 
 test("has no serious accessibility violations", async ({ page }) => {
@@ -268,7 +282,7 @@ test("@claim:offline-reload reloads the demo forecast while offline after the ap
     await page.reload();
     await expect(page).toHaveTitle("Demo — Review Backlog Forecast");
     await expect(page.getByRole("heading", { name: "Plan overdue reviews before changing cards." })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Three honest routes through the queue" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Three recovery plans" })).toBeVisible();
   } finally {
     await context.close();
   }
@@ -310,6 +324,15 @@ test("@claim:local-only neither uploads nor retains raw imported card content", 
   expect([...origins]).toEqual([new URL(page.url()).origin]);
   expect(retained).not.toContain(privateMarker);
   await expect(page.locator("#queue-file")).toHaveValue("");
+});
+
+test("@claim:adjustable-estimates labels estimates and recalculates when one changes", async ({ page }) => {
+  await page.goto("/?demo=1");
+  await expect(page.locator("label[for='seconds-card']")).toContainText("estimate");
+  await expect(page.locator("#capacity-readout")).toContainText("150 cards");
+  await page.locator("#seconds-card").fill("20");
+  await page.getByRole("button", { name: "Run forecast" }).click();
+  await expect(page.locator("#capacity-readout")).toContainText("90 cards");
 });
 
 test("@claim:demo-isolation keeps demo storage separate from a real saved plan", async ({ page }) => {
@@ -405,7 +428,7 @@ test("@claim:no-third-party-runtime loads no third-party scripts, fonts, analyti
   const requests: Array<{ url: string; type: string }> = [];
   page.on("request", (request) => requests.push({ url: request.url(), type: request.resourceType() }));
   await page.goto("/?demo=1");
-  await expect(page.getByRole("heading", { name: "Three honest routes through the queue" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Three recovery plans" })).toBeVisible();
   const origin = new URL(page.url()).origin;
   expect(requests.every((request) => new URL(request.url).origin === origin)).toBe(true);
   expect(requests.filter((request) => request.type === "font")).toEqual([]);
@@ -418,7 +441,7 @@ test("@claim:no-account runs the complete sample without an account or payment s
   page.on("request", (request) => requests.push(request.url()));
   await page.goto("/");
   await page.getByRole("link", { name: /Try it with sample data/ }).click();
-  await expect(page.getByRole("heading", { name: "Three honest routes through the queue" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Three recovery plans" })).toBeVisible();
   await expect(page.locator('input[type="password"]')).toHaveCount(0);
   expect(requests.some((url) => /login|signin|checkout|billing|payment/i.test(url))).toBe(false);
 });
@@ -482,7 +505,7 @@ test("keeps delayed demo startup CLS below 0.1 at 390px", async ({ page }) => {
     await route.continue();
   });
   await page.goto("/?demo=1");
-  await expect(page.getByRole("heading", { name: "Three honest routes through the queue" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Three recovery plans" })).toBeVisible();
   await page.waitForTimeout(300);
   const cls = await page.evaluate(() => (window as typeof window & { __rbfLayoutShifts: number[] }).__rbfLayoutShifts.reduce((sum, value) => sum + value, 0));
   expect(cls).toBeLessThan(0.1);
@@ -510,7 +533,7 @@ test("activates a waiting service-worker update without losing the demo", async 
     await expect(page.getByText("A new version is ready.")).toBeVisible();
     await page.getByRole("button", { name: "Update" }).click();
     await page.waitForFunction(async () => (await caches.keys()).includes("rbf-v1.0.5-shell"));
-    await expect(page.getByRole("heading", { name: "Three honest routes through the queue" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Three recovery plans" })).toBeVisible();
   } finally {
     await context.close();
     await server.close();

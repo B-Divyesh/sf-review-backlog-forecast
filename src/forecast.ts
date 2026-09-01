@@ -3,15 +3,15 @@ import type { ForecastDay, ForecastInput, PolicyForecast, PolicyId } from "./typ
 export const POLICY_META: Record<PolicyId, { name: string; shortDescription: string }> = {
   steady: {
     name: "Steady",
-    shortDescription: "A consistent overdue allowance, aiming to halve the queue in one week and clear it in two."
+    shortDescription: "Uses the same overdue allowance each study session. The sample halves the overdue queue in one week and clears it in two."
   },
   deadline: {
     name: "Deadline",
-    shortDescription: "Uses the spare capacity needed for your chosen finish date, or all available space if that date is out of reach."
+    shortDescription: "Uses the spare capacity needed for your chosen finish date. It says when the deadline cannot fit within your cap."
   },
   gentle: {
     name: "Gentle",
-    shortDescription: "Starts at half the steady allowance, then steps up over five sessions to protect your return rhythm."
+    shortDescription: "Starts at half the Steady allowance. It reaches the full allowance after five study sessions."
   }
 };
 

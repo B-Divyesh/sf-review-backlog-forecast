@@ -777,6 +777,7 @@ footer .text-button:hover { color: var(--vermilion-dark); }
 
 @media (max-width: 840px) {
   .header-tools nav a:not(:first-child) { display: none; }
+  .header-tools nav a:last-child { display: inline-flex; }
   .hero { grid-template-columns: 1fr; min-height: auto; padding-top: 48px; }
   .hero-instrument { width: min(100%, 680px); }
   .import-panel { grid-template-columns: 1fr; }

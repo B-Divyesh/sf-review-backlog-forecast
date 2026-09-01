@@ -23,6 +23,7 @@ a:hover { color: #8e2d1d; }
   transform: translateY(-160%);
 }
 .skip-link:focus { transform: translateY(0); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
 .site-header {
   display: flex;
@@ -96,6 +97,7 @@ li + li { margin-top: 10px; }
 @media (max-width: 640px) {
   .site-header { align-items: flex-start; }
   .site-header nav a:not(:first-child) { display: none; }
+  .site-header nav a:last-child { display: inline-flex; }
   .site-footer { grid-template-columns: 1fr; }
   .site-footer > p:last-child { grid-column: 1; }
   main { padding-top: 56px; }

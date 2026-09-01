@@ -28,6 +28,27 @@
     "sandbox": "An overloaded sample produces visible nonzero regular rollover and an off-target state."
   },
   {
+    "id": "steady-recovery-target",
+    "claim": "The sample Steady plan halves the overdue queue within one week and clears it within two",
+    "where": "Steady recovery-plan description and README",
+    "test": "npm test -- -t @claim:steady-recovery-target",
+    "sandbox": "A fixed sample forecast checks the end-of-week queue, 14-day finish, and on-target status."
+  },
+  {
+    "id": "deadline-feasibility",
+    "claim": "The Deadline plan identifies whether the chosen deadline fits within the session cap",
+    "where": "Deadline recovery-plan description and README",
+    "test": "npm test -- -t @claim:deadline-feasibility",
+    "sandbox": "Fixed reachable and unreachable inputs check both the target status and finish result."
+  },
+  {
+    "id": "gentle-ramp",
+    "claim": "The Gentle plan reaches its full overdue allowance after five study sessions",
+    "where": "Gentle recovery-plan description and README",
+    "test": "npm test -- -t @claim:gentle-ramp",
+    "sandbox": "A fixed sample checks the first six study-session allowances against the documented ramp."
+  },
+  {
     "id": "csv-import",
     "claim": "Imports a one-row queue summary CSV",
     "where": "Import controls and README",
@@ -54,6 +75,13 @@
     "where": "Landing import panel, privacy page, and README",
     "test": "npm run test:e2e -- --grep @claim:local-only",
     "sandbox": "A uniquely marked CSV is imported in a fresh demo; all requests stay same-origin and browser storage contains no marker."
+  },
+  {
+    "id": "adjustable-estimates",
+    "claim": "Labels mark estimates, and you can edit them before rerunning a forecast",
+    "where": "Forecast inputs section",
+    "test": "npm run test:e2e -- --grep @claim:adjustable-estimates",
+    "sandbox": "The demo checks an estimate label, changes time per review, reruns, and observes the changed capacity."
   },
   {
     "id": "demo-isolation",

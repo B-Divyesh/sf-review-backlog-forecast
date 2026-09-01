@@ -1,4 +1,5 @@
 import "./style.css";
+import "./route-focus";
 import { parseCardCsv, SUMMARY_TEMPLATE } from "./csv";
 import { POLICY_META, simulateAll, validateInput } from "./forecast";
 import { storage } from "./storage";
@@ -130,7 +131,7 @@ function formatDay(day: PolicyForecast["days"][number]): string {
 }
 
 function finishLabel(forecast: PolicyForecast): string {
-  if (currentInput?.overdue === 0) return "No backlog";
+  if (currentInput?.overdue === 0) return "No overdue queue";
   return forecast.finishDay ? `Day ${forecast.finishDay}` : `After day ${forecast.days.length}`;
 }
 
@@ -138,13 +139,13 @@ function renderPolicies(): void {
   const restorePolicyFocus = document.activeElement instanceof HTMLInputElement
     && document.activeElement.name === "policy";
   $("#policy-grid").innerHTML = forecasts.map((forecast) => {
-    const status = forecast.onTarget ? "On target" : "Runs long";
+    const status = forecast.onTarget ? "On target" : "Needs more time";
     const half = forecast.halfwayDay ? `Half by day ${forecast.halfwayDay}` : "Under half not reached";
     return `<label class="policy-card ${forecast.id === selectedPolicy ? "is-selected" : ""}">
       <input type="radio" name="policy" value="${forecast.id}" ${forecast.id === selectedPolicy ? "checked" : ""}>
       <span class="policy-top"><b>${forecast.name}</b><span class="status ${forecast.onTarget ? "success" : "warning"}">${status}</span></span>
       <span class="policy-description">${forecast.shortDescription}</span>
-      <span class="policy-metrics"><span><small>Queue clears</small><b>${finishLabel(forecast)}</b></span><span><small>Halfway</small><b>${half.replace("Half by ", "")}</b></span></span>
+      <span class="policy-metrics"><span><small>Overdue queue clears</small><b>${finishLabel(forecast)}</b></span><span><small>Halfway</small><b>${half.replace("Half by ", "")}</b></span></span>
       <span class="select-label">${forecast.id === selectedPolicy ? "Selected" : "Select plan"}<i aria-hidden="true"></i></span>
     </label>`;
   }).join("");
@@ -175,10 +176,10 @@ function renderDetail(): void {
 
   const warning = $("#plan-warning");
   if (forecast.finalRollover > 0) {
-    warning.innerHTML = `<b>Regular work is still rolling over.</b> At this pace, ${forecast.finalRollover} non-overdue cards remain after the forecast window. Raise the cap, reduce new cards, or lower the daily-due estimate before choosing this plan.`;
+    warning.innerHTML = `<b>Regular reviews are still rolling over.</b> At this pace, ${forecast.finalRollover} non-overdue cards remain after the forecast window. Raise the cap, reduce new cards, or lower the daily-due estimate before choosing this plan.`;
     warning.hidden = false;
   } else if (!forecast.onTarget) {
-    warning.innerHTML = `<b>This policy misses its ${forecast.goalDays}-day target.</b> It still respects your cap; the queue is forecast to clear ${forecast.finishDay ? `on day ${forecast.finishDay}` : "after the visible window"}.`;
+    warning.innerHTML = `<b>This recovery plan misses its ${forecast.goalDays}-day target.</b> It still respects your cap; the overdue queue is forecast to clear ${forecast.finishDay ? `on day ${forecast.finishDay}` : "after the visible window"}.`;
     warning.hidden = false;
   } else warning.hidden = true;
 
@@ -430,7 +431,7 @@ async function init(): Promise<void> {
         selectedPolicy = "steady";
         populateForm(sampleInput);
         renderForecast(sampleInput, false);
-        announce("Demo reset to the sample backlog.");
+        announce("Demo reset to the sample overdue queue.");
       });
       $("#start-real").addEventListener("click", async (event) => {
         event.preventDefault();
