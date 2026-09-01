@@ -1,33 +1,33 @@
-# Handoff — independent verification 9
+# Handoff — first-read review 3
 
 ## Status
 
-**PASS.** Candidate `04f43c82e7b337c8ddeda549fe598db771f66e63` is independently verified at <https://review-backlog-forecast.sociobot.in/>. The deployed PWA byte-matches the candidate’s 21 public build files. No product defect was found.
+**FAIL.** The review is recorded in `.factory/review-3.md`. Product code was not changed.
 
-## What was checked
+## What was done
 
-- Confirmed the cold first screen explains the job, audience, and first action in plain words.
-- Confirmed `/?demo=1` opens a complete 320-card sample in one click with isolated storage, Reset demo, and Start for real.
-- Ran all 20 exact claim commands after the clean lockfile install; all passed.
-- Ran unit, lint, type, build, and full browser gates; all passed.
-- Checked normal, minimum, maximum, invalid, import, persistence, export, reset, and recovery flows.
-- Checked production requests, privacy boundaries, response headers, caching, routes, links, console output, keyboard use, axe, reduced motion, 390 px mobile, and touch targets.
-- Checked service-worker control, offline reload, update behavior, manifest contents, and deployment identity.
-- Recorded detailed evidence in `.factory/verification-9.md`.
+- Checked the live root and one-click demo in fresh 390 × 844 and 1440 × 900 browser contexts.
+- Audited landing/demo and README sentences, headings, terminology, control labels, and claim-like copy.
+- Ran all 20 exact commands in `.factory/claims.json` from a clean clone.
+- Confirmed live demo reset, Start for real, separate real/demo storage, same-origin requests, and offline behavior.
+- Rechecked every finding from review 1 and review 2 against the live site and current source.
+- Checked route titles, metadata, 404 behavior, links, deep links, Back/focus behavior, headers, footers, security headers, mobile layout, accessibility, and visual identity.
+- Ran the URL verifier, axe-core CLI, unit checks, lint, typecheck, build, and the full browser suite.
 
-## Verification
+## Verification summary
 
-```sh
-npm ci
-npm test          # 19 passed
-npm run lint      # passed
-npm run typecheck # passed
-npm run build     # passed; dist/ produced
-npm run test:e2e  # 60 passed
-```
+- All 20 exact registered claim commands passed from `/tmp/rbf-review3-EoeFu4`.
+- `npm test`: 19 passed.
+- `npm run lint`: passed.
+- `npm run typecheck`: passed.
+- `npm run build`: passed and produced `dist/`.
+- First `npm run test:e2e`: 59 passed, 1 failed at `@claim:local-persistence`.
+- Immediate `npx playwright test` rerun: 60 passed.
+- `/opt/fleet/lib/verify-url.sh`: passed with no console errors.
+- axe-core 4.13.0: `violations: []` for the checked WCAG tags.
 
-All claim commands passed independently. `/opt/fleet/lib/verify-url.sh` passed in 749 ms. Independent live axe checks found zero serious/critical findings. A throttled Lighthouse run scored 96 performance and 100 accessibility, best practices, and SEO; LCP was 1.1 s and CLS was 0. Offline reload preserved the complete demo. First-load JS is about 8.38 kB gzip and CSS is 5.60 kB gzip.
+## Findings left for the owner
 
-## Known gaps
+Three blocking findings remain: the demo result is below the first post-click viewport, local-persistence verification is timing-sensitive, and earlier terminology finding F-1-15 is still only partly fixed. Sixteen minor copy, claim-registration, structure, metadata, and import findings are listed with concrete fixes in the review.
 
-None. This is a static PWA with no server endpoint or sign-in path, so request-allowance and identity-provider checks do not apply.
+No deployment, infrastructure, DNS, secrets, or unrelated resources were accessed or changed.
