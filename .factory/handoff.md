@@ -1,21 +1,36 @@
-# Handoff — polish 3 complete
+# Verification 10 handoff — FAIL
 
 ## Status
 
-**PASS.** Build `1.0.6` is deployed to <https://review-backlog-forecast.sociobot.in/?demo=1>.
+**FAIL — do not release candidate `4574f59218d14351bd37fdb4e1a9ae9de3344d1c`.**
 
-Repair commit: `b5e45b80241f349367bd33f78c4fbc6effb4aa09` (`fix: complete review three repair set`).
+Tested on 2026-09-01 UTC at <https://review-backlog-forecast.sociobot.in/>. The deployment matches the candidate, and the product works end to end, but two medium-severity acceptance defects remain:
 
-## What changed
+1. Focus rings on dark demo/planner surfaces have only **1.41:1** contrast (`#8e2d1d` against `#173f3a`), below the required 3:1.
+2. Public promises are missing from `.factory/claims.json`, including installability, no transmission of counts/assumptions/saved plans, and saved-plan offline reopening. All existing 23 claims pass, but unlisted claims are release-blocking under the work order.
 
-- Made `?demo=1` a result-first, isolated sample workspace. It opens with the populated Steady, Deadline, and Gentle plans in view, retains the persistent demo banner, and offers Reset demo and Start for real.
-- Fixed IndexedDB persistence so saves resolve only after the transaction commits. Edited valid inputs and chosen plans persist separately inside the demo database.
-- Finished the terminology repair: `overdue queue`, `recovery plan`, and `regular reviews` are used consistently in visitor copy, runtime messages, and manifest metadata.
-- Rewrote every review-3 copy finding, added direct three-step How it works content, named destructive/update controls precisely, and added local Anki count-to-CSV instructions.
-- Added three registered claim tests: `anki-csv-steps`, `input-persistence`, and `daily-cards-minutes`.
-- Added the required 180 × 180 Apple touch icon, route metadata coverage, and live mobile/desktop evidence.
+Full evidence and repair guidance are in [verification-10.md](verification-10.md).
 
-## How to run and verify
+## Verification summary
+
+- First-read and one-click demo gate: PASS.
+- Every exact registered claim command: PASS (23/23; one unique tagged test each).
+- `npm ci`: PASS, 0 vulnerabilities.
+- `npm test`: PASS, 19/19.
+- `npm run lint`: PASS.
+- `npm run typecheck`: PASS.
+- `npm run build`: PASS; `dist/` produced.
+- `npm run test:e2e`: PASS, 70/70.
+- Live deployment identity: PASS, 28/28 public build files SHA-256 match.
+- Live desktop/mobile flow, invalid recovery, privacy request log, offline reload, service-worker update path, headers, caching, and route checks: PASS.
+- Desktop/mobile axe serious or critical findings: none.
+- Manual focus contrast: FAIL on dark surfaces.
+- Claims cross-check against public copy: FAIL because claims are unlisted.
+- Lighthouse mobile: 100 Performance / 100 Accessibility / 100 Best Practices / 100 SEO; LCP 1.3 s, TBT 70 ms, CLS 0.
+
+No product code was modified. Only this handoff and `.factory/verification-10.md` were added or updated.
+
+## Re-run
 
 ```sh
 npm ci
@@ -23,23 +38,6 @@ npm test
 npm run lint
 npm run typecheck
 npm run build
-npm run test:e2e -- --workers=4
+npm run test:e2e
+/opt/fleet/lib/verify-url.sh 'https://review-backlog-forecast.sociobot.in/?demo=1' /tmp/review-backlog-forecast-verify
 ```
-
-Every claim command is listed in `.factory/claims.json`. Open `/?demo=1` for the one-click sandbox. Its documented sample and separate storage namespace are in `.factory/demo.md`.
-
-## Exact verification evidence
-
-- Fresh clone: `/tmp/review-backlog-forecast-clean-aNihqk` at `b5e45b8`.
-- Fresh clone `npm ci`: 143 packages, 0 vulnerabilities.
-- Every exact command in `.factory/claims.json` passed from that clone: 7 tagged Vitest claims and 16 tagged Playwright claims, with each browser claim passing in desktop and mobile.
-- Fresh clone gates passed: `npm test` (19 tests), `npm run lint`, `npm run typecheck`, `npm run build`, and `npm run test:e2e -- --workers=4` (70 passed).
-- The local full browser suite also passed three consecutive times (70 passed each), specifically rechecking deterministic `@claim:local-persistence`.
-- Build output: application JavaScript 7.87 kB gzip; CSS 5.87 kB gzip.
-- Deployed using `swa deploy ./dist --env production --app-name sf-review-backlog-forecast --resource-group sociobot`.
-- Cold live verifier passed at `?demo=1&v=1.0.6`: `.factory/evidence/polish-3/live-1/verify.json` records 678 ms load, zero console errors, `lang=en`, one h1, main, alt text, and labelled buttons.
-- Live desktop/mobile flow, screenshots, route-focus checks, and live Playwright Axe results are in `.factory/evidence/polish-3/live-1/`. The Axe scan found no serious or critical violations on Demo, Privacy, Terms, or the designed 404.
-
-## Known gaps
-
-None. The product remains a static, offline-capable PWA with local browser storage and no third-party runtime services.
