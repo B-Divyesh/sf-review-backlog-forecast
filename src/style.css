@@ -150,7 +150,7 @@ h3 { margin-bottom: 8px; font-size: 1.55rem; }
 .wordmark-mark i:nth-child(3) { height: 100%; background: var(--vermilion); }
 
 .header-tools,
-.header-tools nav { display: flex; align-items: center; gap: 24px; font-family: var(--display); font-size: 0.85rem; }
+.header-tools nav { display: flex; align-items: center; gap: 24px; min-width: 0; font-family: var(--display); font-size: 0.85rem; }
 .header-tools nav a { display: inline-flex; align-items: center; min-width: 44px; min-height: 44px; justify-content: center; }
 
 .connection {
@@ -433,7 +433,7 @@ main { display: block; }
 .text-button:hover { color: #e8bd61; }
 .import-actions details { width: 100%; color: rgb(255 248 232 / 78%); font-size: 0.9rem; }
 .import-actions summary { min-height: 44px; padding-top: 10px; cursor: pointer; font-family: var(--display); }
-.import-actions code { color: var(--cream); font-family: var(--numeric); }
+.import-actions code { color: var(--cream); font-family: var(--numeric); overflow-wrap: anywhere; }
 
 .import-message {
   grid-column: 1 / -1;
@@ -847,7 +847,9 @@ footer .text-button:hover { color: var(--vermilion-dark); }
 
 @media (max-width: 560px) {
   body { font-size: 1rem; }
-  .site-header { padding-top: 14px; padding-bottom: 14px; }
+  .site-header { flex-wrap: wrap; padding-top: 14px; padding-bottom: 14px; }
+  .header-tools { flex-wrap: wrap; justify-content: flex-end; max-width: 100%; margin-left: auto; }
+  .header-tools nav { flex-wrap: wrap; justify-content: flex-end; }
   .wordmark { font-size: 0.78rem; }
   .wordmark-mark { width: 40px; height: 40px; }
   .connection { font-size: 0; }

@@ -384,6 +384,11 @@ test("fits a 390px viewport without page-level horizontal overflow", async ({ pa
   await page.goto("/?demo=1");
   const sizes = await page.evaluate(() => ({ scrollWidth: document.documentElement.scrollWidth, innerWidth: window.innerWidth }));
   expect(sizes.scrollWidth).toBeLessThanOrEqual(sizes.innerWidth);
+  await page.evaluate(() => { document.documentElement.style.fontSize = "32px"; });
+  const zoomedSizes = await page.evaluate(() => ({ scrollWidth: document.documentElement.scrollWidth, innerWidth: window.innerWidth }));
+  expect(zoomedSizes.scrollWidth, "page width at 200% text size").toBeLessThanOrEqual(zoomedSizes.innerWidth);
+  await expect(page.getByRole("heading", { level: 1, name: "Three recovery plans" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Run forecast" })).toBeVisible();
   await page.screenshot({ path: "test-results/mobile-forecast.png", fullPage: true });
 });
 
