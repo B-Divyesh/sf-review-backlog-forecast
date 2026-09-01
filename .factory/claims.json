@@ -77,11 +77,25 @@
     "sandbox": "An isolated browser context loads the demo, gains service-worker control, goes offline, reloads, and observes the forecast."
   },
   {
+    "id": "installability",
+    "claim": "Can be installed as a standalone offline web app",
+    "where": "README",
+    "test": "npm run test:e2e -- --grep @claim:installability",
+    "sandbox": "An isolated browser context gains service-worker control, reports no Chromium installability errors, and verifies the standalone manifest and required icons."
+  },
+  {
     "id": "local-only",
     "claim": "Imported raw card content is neither uploaded nor retained",
     "where": "Landing import panel, privacy page, and README",
     "test": "npm run test:e2e -- --grep @claim:local-only",
     "sandbox": "A uniquely marked CSV is imported in a fresh demo; all requests stay same-origin and browser storage contains no marker."
+  },
+  {
+    "id": "no-forecast-transmission",
+    "claim": "Does not send card counts, imported files, assumptions, or saved plans",
+    "where": "Privacy page",
+    "test": "npm run test:e2e -- --grep @claim:no-forecast-transmission",
+    "sandbox": "A fresh demo imports uniquely marked counts and file content, changes uniquely marked assumptions, saves a uniquely identified plan, reloads, and asserts that no request URL, headers, or body contains any marker."
   },
   {
     "id": "adjustable-estimates",
@@ -103,6 +117,13 @@
     "where": "Saved-plan strip, privacy page, and README",
     "test": "npm run test:e2e -- --grep @claim:local-persistence",
     "sandbox": "A demo plan waits for the committed save confirmation, then reloads and returns from the demo database namespace."
+  },
+  {
+    "id": "saved-plan-offline",
+    "claim": "After one online visit, the forecast and its saved plan reopen without a connection",
+    "where": "Offline page",
+    "test": "npm run test:e2e -- --grep @claim:saved-plan-offline",
+    "sandbox": "An isolated demo saves Gentle, gains service-worker control, goes offline, reloads, and observes both the complete forecast and the saved-plan summary."
   },
   {
     "id": "input-persistence",

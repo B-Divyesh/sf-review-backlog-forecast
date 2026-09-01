@@ -5,6 +5,25 @@ import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:f
 import { tmpdir } from "node:os";
 import { join, normalize } from "node:path";
 
+function rgbChannels(color: string): [number, number, number] {
+  const channels = color.match(/[\d.]+/g)?.slice(0, 3).map(Number);
+  if (!channels || channels.length !== 3) throw new Error(`Unsupported color: ${color}`);
+  return channels as [number, number, number];
+}
+
+function relativeLuminance(color: string): number {
+  const [red, green, blue] = rgbChannels(color).map((channel) => {
+    const normalized = channel / 255;
+    return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+}
+
+function contrastRatio(first: string, second: string): number {
+  const luminances = [relativeLuminance(first), relativeLuminance(second)].sort((a, b) => b - a);
+  return (luminances[0] + 0.05) / (luminances[1] + 0.05);
+}
+
 function contentType(file: string): string {
   if (file.endsWith(".js")) return "text/javascript";
   if (file.endsWith(".css")) return "text/css";
@@ -138,6 +157,61 @@ test("keeps focus on the selected policy radio through repeated arrow navigation
   await page.keyboard.press("ArrowRight");
   await expect(gentle).toBeChecked();
   await expect(gentle).toBeFocused();
+});
+
+test("keeps focus indicators above 3:1 contrast on every dark planner surface", async ({ page }) => {
+  await page.goto("/?demo=1");
+  const savePlan = page.getByRole("button", { name: "Use this plan" });
+  await savePlan.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("heading", { name: "Your last chosen plan" })).toBeVisible();
+  const controls = [
+    ["Reset demo", page.getByRole("button", { name: "Reset demo" })],
+    ["Start for real", page.getByRole("link", { name: "Start for real" })],
+    ["Download CSV template", page.getByRole("button", { name: "Download CSV template" })],
+    ["Accepted CSV columns", page.getByText("Accepted CSV columns", { exact: true })],
+    ["Make a queue CSV from Anki", page.getByText("Make a queue CSV from Anki", { exact: true })],
+    ["Load sample values", page.getByRole("button", { name: "Load sample values" })],
+    ["About overdue cards", page.getByRole("button", { name: "About overdue cards" })],
+    ["About cards due today", page.getByRole("button", { name: "About cards due today" })],
+    ["Run forecast", page.getByRole("button", { name: "Run forecast" })],
+    ["Open plan", page.getByRole("button", { name: "Open plan" })],
+    ["Remove saved plan", page.getByRole("button", { name: "Remove saved plan" })]
+  ] as const;
+  const darkSurface = await page.locator(".planner").evaluate((element) => getComputedStyle(element).backgroundColor);
+
+  for (const [name, control] of controls) {
+    await page.keyboard.press("Tab");
+    await control.focus();
+    await expect(control, name).toBeFocused();
+    const style = await control.evaluate((element) => {
+      const computed = getComputedStyle(element);
+      return {
+        background: computed.backgroundColor,
+        outlineColor: computed.outlineColor,
+        outlineStyle: computed.outlineStyle,
+        outlineWidth: Number.parseFloat(computed.outlineWidth)
+      };
+    });
+    expect(style.outlineStyle, `${name} outline style`).toBe("solid");
+    expect(style.outlineWidth, `${name} outline width`).toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(style.outlineColor, darkSurface), `${name} ring against enamel`).toBeGreaterThanOrEqual(3);
+    if (style.background !== "rgba(0, 0, 0, 0)") {
+      expect(contrastRatio(style.outlineColor, style.background), `${name} ring against its control`).toBeGreaterThanOrEqual(3);
+    }
+  }
+
+  const fileInput = page.locator("#queue-file");
+  await page.keyboard.press("Tab");
+  await fileInput.focus();
+  await expect(fileInput).toBeFocused();
+  const fileIndicator = await page.locator("label[for='queue-file']").evaluate((element) => {
+    const computed = getComputedStyle(element);
+    return { background: computed.backgroundColor, outlineColor: computed.outlineColor, outlineWidth: Number.parseFloat(computed.outlineWidth) };
+  });
+  expect(fileIndicator.outlineWidth, "Import CSV focus width").toBeGreaterThanOrEqual(3);
+  expect(contrastRatio(fileIndicator.outlineColor, darkSurface), "Import CSV ring against enamel").toBeGreaterThanOrEqual(3);
+  expect(contrastRatio(fileIndicator.outlineColor, fileIndicator.background), "Import CSV ring against its control").toBeGreaterThanOrEqual(3);
 });
 
 test("keeps the transient Undo action at least 44px square on mobile", async ({ page }) => {
@@ -332,6 +406,35 @@ test("@claim:offline-reload reloads the demo forecast while offline after the ap
   }
 });
 
+test("@claim:installability is installable as a standalone PWA", async ({ browser }, testInfo) => {
+  const context = await browser.newContext(testInfo.project.name === "mobile" ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } : {});
+  const page = await context.newPage();
+  try {
+    await page.goto("/?demo=1");
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+      if (!navigator.serviceWorker.controller) await new Promise<void>((resolve) => navigator.serviceWorker.addEventListener("controllerchange", () => resolve(), { once: true }));
+    });
+    const cdp = await context.newCDPSession(page);
+    const installability = await cdp.send("Page.getInstallabilityErrors");
+    expect(installability.installabilityErrors).toEqual([]);
+    const manifest = await page.evaluate(async () => await (await fetch("/manifest.webmanifest")).json() as {
+      display: string;
+      start_url: string;
+      icons: Array<{ sizes: string; purpose: string }>;
+    });
+    expect(manifest.display).toBe("standalone");
+    expect(manifest.start_url).toMatch(/^\/?\?source=pwa&v=\d+\.\d+\.\d+$/);
+    expect(manifest.icons).toEqual(expect.arrayContaining([
+      expect.objectContaining({ sizes: "192x192" }),
+      expect.objectContaining({ sizes: "512x512", purpose: "any" }),
+      expect.objectContaining({ sizes: "512x512", purpose: "maskable" })
+    ]));
+  } finally {
+    await context.close();
+  }
+});
+
 test("@claim:local-only neither uploads nor retains raw imported card content", async ({ page }) => {
   const origins = new Set<string>();
   page.on("request", (request) => origins.add(new URL(request.url()).origin));
@@ -370,6 +473,56 @@ test("@claim:local-only neither uploads nor retains raw imported card content", 
   await expect(page.locator("#queue-file")).toHaveValue("");
 });
 
+test("@claim:no-forecast-transmission sends no counts, imported file data, assumptions, or saved plan", async ({ page }) => {
+  const requests: Array<{ headers: Record<string, string>; method: string; postData: string | null; url: string }> = [];
+  page.on("request", (request) => requests.push({
+    headers: request.headers(),
+    method: request.method(),
+    postData: request.postData(),
+    url: request.url()
+  }));
+  await page.goto("/?demo=1");
+
+  const fileNameMarker = "PRIVATE_QUEUE_FILE_64193.csv";
+  const fileContentMarker = "PRIVATE_FILE_CONTENT_52961";
+  await page.locator("#queue-file").setInputFiles({
+    name: fileNameMarker,
+    mimeType: "text/csv",
+    buffer: Buffer.from(`overdue,due_today,daily_due,private_note\n91827,81234,78901,${fileContentMarker}\n`)
+  });
+  await page.locator("#new-cards").fill("7654");
+  await page.locator("#seconds-card").fill("293");
+  await page.locator("#cap-minutes").fill("299");
+  await page.locator("#deadline-days").fill("83");
+  await page.locator("#study-days").fill("4");
+  await page.getByRole("button", { name: "Run forecast" }).click();
+  await page.getByRole("radio", { name: /Gentle/ }).check();
+  await page.getByRole("button", { name: "Use this plan" }).click();
+  await expect(page.getByText("Gentle plan saved on this device.")).toBeVisible();
+
+  const savedPlan = await page.evaluate(async () => await new Promise<{ id: string; savedAt: string; input: { overdue: number; secondsPerCard: number } }>((resolve, reject) => {
+    const open = indexedDB.open("review-backlog-forecast-demo");
+    open.onerror = () => reject(open.error);
+    open.onsuccess = () => {
+      const db = open.result;
+      const get = db.transaction("records", "readonly").objectStore("records").get("plan");
+      get.onerror = () => reject(get.error);
+      get.onsuccess = () => { resolve(get.result); db.close(); };
+    };
+  }));
+  expect(savedPlan.input).toMatchObject({ overdue: 91827, secondsPerCard: 293 });
+  await page.reload();
+  await expect(page.locator("#saved-summary")).toContainText("Gentle · 91,827 overdue · 299-minute cap");
+
+  const transmitted = JSON.stringify(requests);
+  const privateMarkers = [fileNameMarker, fileContentMarker, "91827", "81234", "78901", "7654", "293", "299", "83", savedPlan.id, savedPlan.savedAt];
+  expect(requests.every((request) => request.method === "GET" && request.postData === null)).toBe(true);
+  for (const marker of privateMarkers) {
+    expect(transmitted, `outgoing requests must omit ${marker}`).not.toContain(marker);
+    expect(transmitted, `outgoing requests must omit encoded ${marker}`).not.toContain(encodeURIComponent(marker));
+  }
+});
+
 test("@claim:adjustable-estimates labels estimates and recalculates when one changes", async ({ page }) => {
   await page.goto("/?demo=1");
   await expect(page.locator("label[for='seconds-card']")).toContainText("estimate");
@@ -400,6 +553,29 @@ test("@claim:local-persistence restores a chosen demo plan after reload", async 
   await page.reload();
   await expect(page.getByRole("heading", { name: "Your last chosen plan" })).toBeVisible();
   await expect(page.locator("#saved-summary")).toContainText("Deadline · 320 overdue");
+});
+
+test("@claim:saved-plan-offline reopens a saved plan without a connection", async ({ browser }, testInfo) => {
+  const context = await browser.newContext(testInfo.project.name === "mobile" ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } : {});
+  const page = await context.newPage();
+  try {
+    await page.goto("/?demo=1");
+    await page.getByRole("radio", { name: /Gentle/ }).check();
+    await page.getByRole("button", { name: "Use this plan" }).click();
+    await expect(page.getByText("Gentle plan saved on this device.")).toBeVisible();
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+      if (!navigator.serviceWorker.controller) await new Promise<void>((resolve) => navigator.serviceWorker.addEventListener("controllerchange", () => resolve(), { once: true }));
+    });
+    await context.setOffline(true);
+    await page.reload();
+    await expect(page.getByRole("heading", { level: 1, name: "Three recovery plans" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Your last chosen plan" })).toBeVisible();
+    await expect(page.locator("#saved-summary")).toContainText("Gentle · 320 overdue · 30-minute cap");
+    await expect(page.locator("#connection-status")).toContainText("Offline · forecast still works");
+  } finally {
+    await context.close();
+  }
 });
 
 test("@claim:input-persistence restores edited inputs without saving a plan", async ({ page }) => {
@@ -546,7 +722,7 @@ test("publishes route metadata, shared legal chrome, and build identity", async 
     await page.goto(route);
     await expect(page.getByRole("banner").getByRole("link", { name: "Review Backlog Forecast home" })).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
-    await expect(page.getByRole("contentinfo")).toContainText("Built by Param Factory · Build 1.0.6");
+    await expect(page.getByRole("contentinfo")).toContainText("Built by Param Factory · Build 1.0.7");
   }
   for (const [route, title, canonical] of [
     ["/", "Review Backlog Forecast — Plan an overdue queue", "https://review-backlog-forecast.sociobot.in/"],
@@ -606,7 +782,7 @@ test("activates a waiting service-worker update without losing the demo", async 
   cpSync("dist", fixture, { recursive: true });
   const workerPath = join(fixture, "sw.js");
   const originalWorker = readFileSync(workerPath, "utf8");
-  expect(originalWorker).toContain('const VERSION = "rbf-v1.0.6"');
+  expect(originalWorker).toContain('const VERSION = "rbf-v1.0.7"');
   const server = await startStaticServer(fixture);
   const context = await browser.newContext();
   const page = await context.newPage();
@@ -618,11 +794,11 @@ test("activates a waiting service-worker update without losing the demo", async 
         await new Promise<void>((resolve) => navigator.serviceWorker.addEventListener("controllerchange", () => resolve(), { once: true }));
       }
     });
-    writeFileSync(workerPath, originalWorker.replace("rbf-v1.0.6", "rbf-v1.0.7"));
+    writeFileSync(workerPath, originalWorker.replace("rbf-v1.0.7", "rbf-v1.0.8"));
     await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration())?.update(); });
     await expect(page.getByText("A new version is ready.")).toBeVisible();
     await page.getByRole("button", { name: "Update app" }).click();
-    await page.waitForFunction(async () => (await caches.keys()).includes("rbf-v1.0.7-shell"));
+    await page.waitForFunction(async () => (await caches.keys()).includes("rbf-v1.0.8-shell"));
     await expect(page.getByRole("heading", { name: "Three recovery plans" })).toBeVisible();
   } finally {
     await context.close();

@@ -17,8 +17,10 @@ The product uses one deliberately light treatment. The warm paper field and dark
 | Muted ink | `#53625D` | Supporting copy; 5.4:1 on paper |
 | Dial cream | `#FFF8E8` | Inputs and high-emphasis readouts |
 | Vermilion | `#C9462E` | Primary action and warning needle |
-| Vermilion dark | `#8E2D1D` | Hover/focus contrast |
+| Vermilion dark | `#8E2D1D` | Hover and focus contrast on warm paper |
 | Brass | `#B8892D` | Selection and forecast markers |
+| Focus gold | `#F4CC75` | Keyboard focus on enamel; 7.60:1 on enamel and 3.12:1 on the vermilion action |
+| Aged brass focus | `#A88230` | Import focus between cream and enamel; 3.36:1 on cream and 3.26:1 on enamel |
 | Success | `#286348` | Feasible/complete status |
 | Danger | `#A52E25` | Invalid or over-cap state |
 

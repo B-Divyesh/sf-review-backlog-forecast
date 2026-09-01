@@ -10,6 +10,8 @@
   --vermilion: #c9462e;
   --vermilion-dark: #8e2d1d;
   --brass: #b8892d;
+  --focus-on-dark: #f4cc75;
+  --focus-between: #a88230;
   --success: #286348;
   --danger: #a52e25;
   --display: "Arial Narrow", "Roboto Condensed", "Franklin Gothic Medium", Arial, sans-serif;
@@ -56,6 +58,13 @@ a:hover { color: var(--vermilion-dark); }
   outline: 3px solid var(--vermilion-dark);
   outline-offset: 3px;
   border-radius: 2px;
+}
+
+.demo-banner :focus-visible,
+.saved-strip :focus-visible,
+.planner :focus-visible,
+.toast :focus-visible {
+  outline-color: var(--focus-on-dark);
 }
 
 ::selection { background: var(--brass); color: var(--ink); }
@@ -407,7 +416,7 @@ main { display: block; }
 
 .file-button small { color: var(--muted); font-family: var(--numeric); font-size: 0.7rem; font-weight: 400; }
 .file-button:hover { background: var(--paper-deep); }
-.file-button:focus-within { outline: 3px solid #e8bd61; outline-offset: 3px; }
+.file-button:focus-within { outline: 3px solid var(--focus-between); outline-offset: 3px; }
 
 .text-button {
   min-height: 44px;
