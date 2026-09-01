@@ -1,26 +1,18 @@
-# Handoff — polish 1
+# Handoff — independent verification 8
 
 ## Status
 
-**PASS.** Repair commit `0ca9a88` is deployed to <https://review-backlog-forecast.sociobot.in/?demo=1>. All 15 findings in `.factory/review-1.md` are repaired and mapped in `.factory/polish-1.md`.
+**PASS.** Candidate `fe3f00be1651d2234326f60d9ea70e54b0a99ba9` is deployed at <https://review-backlog-forecast.sociobot.in/> and matches the tested production build.
 
-## What changed
+## What was verified
 
-- Route loads and Back/Forward focus the destination h1 and announce it politely. Privacy stays visible in the compact mobile header.
-- Four missing claims now have registry entries and exact tagged tests: Steady target, Deadline feasibility, Gentle ramp, and adjustable estimates.
-- Every required plain-language rewrite is applied in the landing page and README. The catalog description is a verb-first sentence under 120 characters.
-- The distinct mid-century recovery-console visual system, local-only demo namespace, banner/reset/start-real controls, PWA, real 404, metadata, and legal links remain intact.
+- All 20 listed claim commands passed from the clean workspace.
+- `npm test` passed 18 tests; lint and typecheck passed; `npm run build` produced `dist/`; `npm run test:e2e` passed 60 tests.
+- Live first read, one-click demo, normal forecast, minimum valid inputs, invalid-input recovery, CSV-date recovery, persistence, schedule export, privacy request logging, offline reload, desktop, 390 px mobile, keyboard skip link, reduced motion, response headers, caching, and console/page-error checks passed.
+- Live HTML and seven first-load assets byte-match `dist/` and report build `1.0.4`.
+- Live Playwright axe found zero serious/critical findings. The standalone Axe CLI browser launcher could not start in this worker; the passing Playwright scan and repository axe suite are the browser evidence.
 
-## Exact verification
-
-- Fresh clone `/tmp/review-backlog-forecast-clean-CRi2gl`: `npm ci` succeeded with 0 vulnerabilities.
-- Every one of 20 `.factory/claims.json` commands passed: 7 single-test Vitest claims and 13 Playwright claims in desktop and mobile contexts.
-- Local: `npm test` — 18 passed; `npm run lint` — passed; `npm run typecheck` — passed; `npm run build` — passed; `npm run test:e2e -- --workers=4` — 60 passed.
-- Accessibility: committed Playwright Axe check passed on Demo, Privacy, Terms, and 404 in desktop and mobile. The standalone Axe CLI was attempted, but its Selenium launcher could not find Chrome in this worker; Playwright's bundled browser is the passing evidence.
-- Live: `/opt/fleet/lib/verify-url.sh` passed at the demo URL. `.factory/evidence/polish-1/verify.json` records 696 ms cold load, no console/page errors, correct title/lang/one h1/main, and no missing alts or unnamed buttons. Desktop and mobile screenshots are in the same directory.
-- Live mobile recheck confirmed the demo banner, sample 320 overdue cards, `Three recovery plans`, 390 px width without overflow, Privacy h1 focus/announcement, and demo h1 focus/announcement on Back. Screenshot: `.factory/evidence/polish-1/live-mobile-demo.png`.
-
-## Run and deploy
+## How to run and verify
 
 ```sh
 npm ci
@@ -29,9 +21,10 @@ npm run lint
 npm run typecheck
 npm run build
 npm run test:e2e
-/opt/fleet/lib/deploy-static.sh review-backlog-forecast dist
 ```
 
-## Known gaps
+Open <https://review-backlog-forecast.sociobot.in/?demo=1> or use **Try it with sample data** on the landing page. Full evidence is in `.factory/verification-8.md`.
 
-None in the product. The only tooling limitation was the standalone Axe CLI Chrome lookup described above; the repository's Playwright Axe coverage passes.
+## Known gaps and next steps
+
+No product defects were found. The only verification-environment limitation is the standalone Axe CLI Selenium launcher; Playwright axe coverage passed locally and on the live demo.
