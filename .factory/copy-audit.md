@@ -1,26 +1,46 @@
-# Copy audit — polish 2
+# Copy audit — polish 3
 
-All reviewed landing-page, legal-page, and README sentences are 22 words or fewer. No reviewed sentence uses a banned marketing word. “Backlog” appears only in the product name; the workload is always an “overdue queue.”
+Checked 2026-09-01. The landing, demo, legal routes, and README use no banned marketing terms. Each audited sentence is 22 words or fewer. Product-name occurrences of “Backlog” are retained only as the proper name **Review Backlog Forecast**.
 
-## Landing-page sentences
+## Landing and demo sentences
 
 | Words | Sentence |
 | ---: | --- |
-| 5 | Plan an overdue queue. |
-| 8 | Plan an overdue queue before changing cards. |
+| 10 | Demo — sample data, nothing is saved to your real plan. |
+| 5 | Explore the 320-card example. |
+| 7 | Plan an overdue queue before changing cards. |
 | 15 | For learners returning after missed days, compare capped recovery plans before changing cards in Anki. |
-| 7 | See a 320-card overdue queue plan. |
+| 6 | See a 320-card overdue queue plan. |
 | 4 | Nothing real is saved. |
+| 4 | Compare three recovery plans. |
 | 4 | Nothing is rescheduled here. |
-| 7 | Use totals, or import a simple CSV. |
+| 10 | Preview a recovery plan before you change cards in Anki. |
+| 10 | Add your overdue queue, due-today cards, and regular reviews estimate. |
+| 10 | Choose the minutes you can study in one session. |
+| 12 | Choose a recovery plan, then save or export its daily schedule. |
+| 6 | Enter totals or import a CSV. |
 | 5 | Labels mark each estimate. |
-| 9 | You can edit it before running a forecast. |
-| 10 | Import card due dates or a one-row summary. |
+| 8 | You can edit it before running a forecast. |
+| 8 | Import card due dates or a one-row summary. |
 | 10 | The file is read in this browser and never uploaded. |
+| 11 | In Anki Desktop, open Browse and search `is:review prop:due<0`. |
+| 12 | Copy the shown count into `overdue` in the downloaded template. |
+| 11 | Search `is:review prop:due=0` and copy its count into `due_today`. |
+| 13 | Enter a usual day’s regular reviews in `daily_due`, then import the saved CSV. |
 | 6 | Preview only: this forecasts counts only. |
 | 8 | It cannot read or change your Anki collection. |
-| 10 | Add your overdue queue totals to compare recovery plans. |
-| 12 | You can change every assumption and rerun as often as you need. |
+| 11 | 150 cards fit inside the 30-minute cap at 12 seconds each. |
+| 8 | Uses the same overdue allowance each study session. |
+| 14 | The sample halves the overdue queue in one week and clears it in two. |
+| 10 | Uses the spare capacity needed for your chosen finish date. |
+| 10 | It says when the deadline cannot fit within your cap. |
+| 6 | Starts at half the Steady allowance. |
+| 9 | It reaches the full allowance after five study sessions. |
+| 10 | Due-today and estimated regular reviews get capacity before overdue cards. |
+| 7 | Minutes are card count × your seconds-per-review estimate. |
+| 8 | Unreviewed regular reviews roll forward and stay visible. |
+| 9 | Future intervals, retention, lapses, and FSRS changes remain unknown. |
+| 8 | Edit a marked estimate, then rerun the forecast. |
 | 5 | No card is ever moved. |
 | 10 | A free planning tool that keeps plans on this device. |
 
@@ -30,36 +50,43 @@ All reviewed landing-page, legal-page, and README sentences are 22 words or fewe
 | ---: | --- |
 | 16 | Review Backlog Forecast is a free planning utility for spaced-repetition learners returning to an overdue queue. |
 | 10 | It compares three recovery plans before the learner changes anything. |
-| 16 | Try the complete sample at `/?demo=1`, or use **Try it with sample data** on the first screen. |
+| 18 | Try the complete sample at `/?demo=1`, or use **Try it with sample data** on the first screen. |
 | 12 | The demo opens a 320-card overdue queue in its own browser database. |
 | 7 | It never reads or changes real plans. |
-| 11 | Steady uses the same overdue allowance each study session. |
+| 9 | Steady uses the same overdue allowance each study session. |
 | 14 | The sample halves the overdue queue in one week and clears it in two. |
-| 10 | Deadline uses spare capacity for your chosen finish date. |
-| 11 | It says when the deadline cannot fit within your cap. |
-| 10 | Gentle starts at half the Steady allowance. |
-| 10 | It reaches the full allowance after five study sessions. |
-| 11 | Every recovery plan protects due-today and estimated regular reviews first. |
-| 13 | It shows cards and minutes, exposes regular-review rollover, and enforces the session cap. |
+| 9 | Deadline uses spare capacity for your chosen finish date. |
+| 10 | It says when the deadline cannot fit within your cap. |
+| 7 | Gentle starts at half the Steady allowance. |
+| 9 | It reaches the full allowance after five study sessions. |
+| 10 | Every recovery plan protects due-today and estimated regular reviews first. |
+| 14 | It shows cards and minutes, carries unfinished regular reviews forward, and enforces the session cap. |
 | 10 | The app does not connect to Anki or reschedule cards. |
-| 14 | For people returning to Anki after missed days who need a clear recovery plan. |
+| 14 | For people returning to Anki after missed days who need cards and minutes planned by day. |
 | 8 | The app accepts a one-row queue summary CSV. |
 | 17 | It also accepts grouped rows with `due_date` (`YYYY-MM-DD`) or `days_overdue`, plus optional `count` or `quantity`. |
 | 10 | The browser does not upload or retain raw card content. |
+| 10 | To make a summary CSV from Anki Desktop, open **Browse**. |
+| 12 | Search `is:review prop:due<0`, then copy the count into `overdue` in the template. |
+| 11 | Search `is:review prop:due=0`, then copy that count into `due_today`. |
+| 9 | Enter a usual day’s regular reviews in `daily_due`. |
+| 6 | Save the file, then import it. |
 | 13 | The footer exports a JSON backup of local settings and the chosen plan. |
 | 6 | The import control restores that backup. |
 | 9 | The selected daily schedule exports as CSV for reference. |
+| 7 | Schedule CSVs are not Anki rescheduling files. |
+| 8 | Vite and TypeScript produce an installable offline web app. |
+| 12 | It loads no third-party fonts, scripts, analytics, advertising, or runtime image service. |
+| 7 | No account or payment step is required. |
+| 12 | Inputs and the last chosen plan stay in this browser’s local database. |
+| 14 | After the first visit, the browser’s offline cache keeps the app available without a connection. |
 
 ## Terminology table
 
 | Concept | One term |
 | --- | --- |
 | Missed review work | overdue queue |
-| A selected option | recovery plan |
+| A learner’s selected option | recovery plan |
 | Expected non-overdue work | regular reviews |
 
-## First-screen facts and footer
-
-- The desktop first trust row is ordered `Preview only`, `Stays on this device`, `Free`; the browser test checks the `Free` fact is visible at 1440 × 900.
-- The next fact is `No Anki access`. The header states `Ready offline`.
-- Every visitor footer uses `A free planning tool that keeps plans on this device.` The landing footer has no generated-image note; the required image record remains in `.factory/design.md`.
+The terminology regression test reads landing, README, legal pages, manifest, and visitor-facing runtime copy. It rejects the retired phrases `Usual daily due`, `estimated normal reviews`, `regular-review rollover`, `daily-due estimate`, and `spaced-repetition backlog`.

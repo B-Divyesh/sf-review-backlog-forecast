@@ -31,17 +31,37 @@ describe("release contract", () => {
     }
   });
 
-  it("uses overdue queue as the visitor-facing workload term and keeps the free fact in the first row", () => {
+  it("uses one visitor-facing term for each forecast concept and keeps the free fact in the first row", () => {
     const landing = readFileSync("index.html", "utf8");
+    const visitorCopy = [
+      landing,
+      readFileSync("README.md", "utf8"),
+      readFileSync("public/manifest.webmanifest", "utf8"),
+      readFileSync("src/app.ts", "utf8"),
+      readFileSync("src/csv.ts", "utf8"),
+      readFileSync("src/forecast.ts", "utf8"),
+      readFileSync("privacy/index.html", "utf8"),
+      readFileSync("terms/index.html", "utf8"),
+      readFileSync("404.html", "utf8"),
+      readFileSync("offline.html", "utf8")
+    ].join("\n");
     expect(landing).toContain("Plan an overdue queue before changing cards.");
     expect(landing).toContain("For learners returning after missed days, compare capped recovery plans before changing cards in Anki.");
     expect(landing).toMatch(/<li>Preview only<\/li>\s*<li>Stays on this device<\/li>\s*<li>Free<\/li>/);
+    expect(visitorCopy).toContain("Regular reviews per day");
+    expect(visitorCopy).toContain("recovery plan");
+    expect(readFileSync("public/manifest.webmanifest", "utf8")).toContain("Preview capped recovery plans for an overdue spaced-repetition queue.");
     for (const retiredCopy of [
       "Plan a spaced-repetition review backlog.",
       "Plan overdue reviews before changing cards.",
       "before changing an Anki queue",
       "local-first planning utility",
-      "provenance in the project design notes"
-    ]) expect(landing).not.toContain(retiredCopy);
+      "provenance in the project design notes",
+      "Usual daily due",
+      "estimated normal reviews",
+      "regular-review rollover",
+      "daily-due estimate",
+      "spaced-repetition backlog"
+    ]) expect(visitorCopy).not.toContain(retiredCopy);
   });
 });

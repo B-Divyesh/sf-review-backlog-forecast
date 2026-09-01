@@ -8,13 +8,13 @@ Try the complete sample at `/?demo=1`, or use **Try it with sample data** on the
 - **Deadline** uses spare capacity for your chosen finish date. It says when the deadline cannot fit within your cap.
 - **Gentle** starts at half the Steady allowance. It reaches the full allowance after five study sessions.
 
-Every recovery plan protects due-today and estimated regular reviews first. It shows cards and minutes, exposes regular-review rollover, and enforces the session cap. The app does not connect to Anki or reschedule cards.
+Every recovery plan protects due-today and estimated regular reviews first. It shows cards and minutes, carries unfinished regular reviews forward, and enforces the session cap. The app does not connect to Anki or reschedule cards.
 
 Production URL: <https://review-backlog-forecast.sociobot.in>
 
 ## Who it is for
 
-For people returning to Anki after missed days who need a clear recovery plan.
+For people returning to Anki after missed days who need cards and minutes planned by day.
 
 ## Import formats
 
@@ -26,6 +26,8 @@ overdue,due_today,daily_due
 ```
 
 It also accepts grouped rows with `due_date` (`YYYY-MM-DD`) or `days_overdue`, plus optional `count` or `quantity`. The browser does not upload or retain raw card content.
+
+To make a summary CSV from Anki Desktop, open **Browse**. Search `is:review prop:due<0`, then copy the count into `overdue` in the template. Search `is:review prop:due=0`, then copy that count into `due_today`. Enter a usual day’s regular reviews in `daily_due`. Save the file, then import it.
 
 The footer exports a JSON backup of local settings and the chosen plan. The import control restores that backup. The selected daily schedule exports as CSV for reference. Schedule CSVs are not Anki rescheduling files.
 
@@ -60,7 +62,7 @@ npm run test:e2e
 
 ## Privacy and architecture
 
-Vite and vanilla TypeScript produce a static PWA. It loads no third-party fonts, scripts, analytics, advertising, or runtime image service. No account or payment step is required. Inputs and the last chosen plan are stored in this browser’s IndexedDB. The versioned service worker makes the app available offline after the first visit. See [the privacy page](https://review-backlog-forecast.sociobot.in/privacy/) and [the terms](https://review-backlog-forecast.sociobot.in/terms/).
+Vite and TypeScript produce an installable offline web app. It loads no third-party fonts, scripts, analytics, advertising, or runtime image service. No account or payment step is required. Inputs and the last chosen plan stay in this browser’s local database. After the first visit, the browser’s offline cache keeps the app available without a connection. See [the privacy page](https://review-backlog-forecast.sociobot.in/privacy/) and [the terms](https://review-backlog-forecast.sociobot.in/terms/).
 
 The researched opportunity lives in `.factory/brief.json`; the product-specific visual system and generated-image provenance live in `.factory/design.md`.
 

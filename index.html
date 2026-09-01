@@ -21,9 +21,8 @@
     <link rel="canonical" href="https://review-backlog-forecast.sociobot.in/">
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="icon" href="/icons/icon.3eb40ef1.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icons/icon-192.672eaa75.png">
+    <link rel="apple-touch-icon" href="/icons/icon-180.8072a37b.png" sizes="180x180">
     <title>Review Backlog Forecast — Plan an overdue queue</title>
-    <script src="/assets/demo-boot.35963a50.js"></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to forecast controls</a>
@@ -37,7 +36,7 @@
         <span class="connection" id="connection-status"><span aria-hidden="true"></span> Ready offline</span>
         <nav aria-label="Primary">
           <a href="/?demo=1">Demo</a>
-          <a href="/?demo=1#guide">How it works</a>
+          <a href="/#how-it-works">How it works</a>
           <a href="/privacy/">Privacy</a>
         </nav>
       </div>
@@ -45,12 +44,11 @@
 
     <main id="main" tabindex="-1">
       <section class="demo-banner" id="demo-banner" hidden aria-label="Demo mode">
-        <p><b>Demo — sample data, nothing is saved to your real plan.</b> Explore the 320-card example safely.</p>
+        <p><b>Demo — sample data, nothing is saved to your real plan.</b> Explore the 320-card example.</p>
         <div><button class="text-button" id="reset-demo" type="button">Reset demo</button><a class="text-button" id="start-real" href="/">Start for real</a></div>
       </section>
       <section class="hero" aria-labelledby="page-title">
         <div class="hero-copy">
-          <p class="eyebrow">Plan an overdue queue.</p>
           <h1 id="page-title">Plan an overdue queue before changing cards.</h1>
           <p class="lede">For learners returning after missed days, compare capped recovery plans before changing cards in Anki.</p>
           <p class="hero-action"><a class="button button-primary" href="/?demo=1">Try it with sample data <span aria-hidden="true">→</span></a><span>See a 320-card overdue queue plan. Nothing real is saved.</span></p>
@@ -70,6 +68,18 @@
         </figure>
       </section>
 
+      <section class="how-it-works" id="how-it-works" aria-labelledby="how-it-works-title">
+        <div class="section-heading">
+          <h2 id="how-it-works-title">How it works</h2>
+          <p>Preview a recovery plan before you change cards in Anki.</p>
+        </div>
+        <ol class="step-list">
+          <li><span>01</span><h3>Enter or import totals</h3><p>Add your overdue queue, due-today cards, and regular reviews estimate.</p></li>
+          <li><span>02</span><h3>Set a session cap</h3><p>Choose the minutes you can study in one session.</p></li>
+          <li><span>03</span><h3>Compare or export a plan</h3><p>Choose a recovery plan, then save or export its daily schedule.</p></li>
+        </ol>
+      </section>
+
       <section class="saved-strip" id="saved-strip" hidden aria-labelledby="saved-title">
         <div>
           <p class="eyebrow">Plan on this device</p>
@@ -78,7 +88,7 @@
         </div>
         <div class="saved-actions">
           <button class="button button-quiet" id="open-saved" type="button">Open plan</button>
-          <button class="text-button danger-text" id="remove-saved" type="button">Remove</button>
+          <button class="text-button danger-text" id="remove-saved" type="button">Remove saved plan</button>
         </div>
       </section>
 
@@ -86,7 +96,7 @@
         <div class="section-heading">
           <p class="eyebrow">Forecast inputs</p>
           <h2 id="planner-title">Describe your overdue queue</h2>
-          <p>Use totals, or import a simple CSV. Labels mark each estimate. You can edit it before running a forecast.</p>
+          <p>Enter totals or import a CSV. Labels mark each estimate. You can edit it before running a forecast.</p>
         </div>
 
         <div class="import-panel">
@@ -103,6 +113,15 @@
               <summary>Accepted CSV columns</summary>
               <p><b>Summary:</b> <code>overdue,due_today,daily_due</code></p>
               <p><b>Card rows:</b> <code>due_date</code> (YYYY-MM-DD) or <code>days_overdue</code>, plus optional <code>count</code>.</p>
+            </details>
+            <details id="anki-csv-steps">
+              <summary>Make a queue CSV from Anki</summary>
+              <ol>
+                <li>In Anki Desktop, open Browse and search <code>is:review prop:due&lt;0</code>.</li>
+                <li>Copy the shown count into <code>overdue</code> in the downloaded template.</li>
+                <li>Search <code>is:review prop:due=0</code> and copy its count into <code>due_today</code>.</li>
+                <li>Enter a usual day’s regular reviews in <code>daily_due</code>, then import the saved CSV.</li>
+              </ol>
             </details>
           </div>
           <p class="import-message" id="import-message" role="status" aria-live="polite"></p>
@@ -125,7 +144,7 @@
               <span class="number-input"><input id="due-today" name="dueToday" type="number" min="0" max="100000" step="1" inputmode="numeric" required><small>cards</small></span>
             </label>
             <label class="dial-field" for="daily-due">
-              <span>Usual daily due <em>estimate</em></span>
+              <span>Regular reviews per day <em>estimate</em></span>
               <span class="number-input"><input id="daily-due" name="dailyDue" type="number" min="0" max="100000" step="1" inputmode="numeric" required><small>/ day</small></span>
             </label>
             <label class="dial-field" for="new-cards">
@@ -167,15 +186,34 @@
         <p class="forecast-status" id="forecast-status" role="status" aria-live="polite" hidden></p>
         <fieldset class="policy-fieldset">
           <legend class="visually-hidden">Choose a recovery plan</legend>
-          <div class="policy-grid" id="policy-grid"></div>
+          <div class="policy-grid" id="policy-grid" aria-live="polite">
+            <div class="policy-card is-selected">
+              <span class="policy-top"><b>Steady</b><span class="status success">On target</span></span>
+              <span class="policy-description">Uses the same overdue allowance each study session.</span>
+              <span class="policy-metrics"><span><small>Overdue queue clears</small><b>Day 13</b></span><span><small>Halfway</small><b>Day 6</b></span></span>
+              <span class="select-label">Sample plan<i aria-hidden="true"></i></span>
+            </div>
+            <div class="policy-card">
+              <span class="policy-top"><b>Deadline</b><span class="status success">On target</span></span>
+              <span class="policy-description">Uses spare capacity for your chosen finish date.</span>
+              <span class="policy-metrics"><span><small>Overdue queue clears</small><b>Day 13</b></span><span><small>Halfway</small><b>Day 6</b></span></span>
+              <span class="select-label">Sample plan<i aria-hidden="true"></i></span>
+            </div>
+            <div class="policy-card">
+              <span class="policy-top"><b>Gentle</b><span class="status success">On target</span></span>
+              <span class="policy-description">Starts at half the Steady allowance.</span>
+              <span class="policy-metrics"><span><small>Overdue queue clears</small><b>Day 16</b></span><span><small>Halfway</small><b>Day 9</b></span></span>
+              <span class="select-label">Sample plan<i aria-hidden="true"></i></span>
+            </div>
+          </div>
         </fieldset>
 
         <article class="plan-detail" aria-labelledby="detail-title">
           <header class="detail-header">
             <div>
               <p class="eyebrow">Selected recovery plan</p>
-              <h2 id="detail-title"></h2>
-              <p id="detail-description"></p>
+              <h2 id="detail-title">Steady plan</h2>
+              <p id="detail-description">Uses the same overdue allowance each study session.</p>
             </div>
             <div class="detail-actions">
               <button class="button button-primary" id="save-plan" type="button">Use this plan</button>
@@ -183,7 +221,7 @@
             </div>
           </header>
 
-          <div class="readout-grid" id="readout-grid"></div>
+          <div class="readout-grid" id="readout-grid"><div><span>Original queue clear</span><strong>13 days</strong></div><div><span>50% reduction</span><strong>Day 6</strong></div><div><span>Largest session</span><strong>150 <small>cards</small></strong></div><div><span>Peak time</span><strong>30 <small>min</small></strong></div></div>
           <div class="warning-note" id="plan-warning" hidden></div>
 
           <figure class="forecast-plot" aria-labelledby="plot-caption">
@@ -208,7 +246,7 @@
               <h3>What moves cards in this forecast</h3>
             </div>
             <ol>
-              <li><b>Today stays in the plan.</b> Due-today and estimated normal reviews get capacity before overdue cards.</li>
+              <li><b>Today stays in the plan.</b> Due-today and estimated regular reviews get capacity before overdue cards.</li>
               <li><b>One pace for every card.</b> Minutes are card count × your seconds-per-review estimate.</li>
               <li><b>Rest days add regular reviews.</b> Unreviewed regular reviews roll forward and stay visible.</li>
               <li><b>Anki scheduling is not simulated.</b> Future intervals, retention, lapses, and FSRS changes remain unknown.</li>
@@ -222,7 +260,7 @@
         <div>
           <p class="eyebrow">No forecast yet</p>
           <h2 id="empty-title">Add your overdue queue totals to compare recovery plans.</h2>
-          <p>You can change every assumption and rerun as often as you need. No card is ever moved.</p>
+          <p>Edit a marked estimate, then rerun the forecast. No card is ever moved.</p>
         </div>
       </section>
     </main>
@@ -243,9 +281,10 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite" hidden>
       <span id="toast-message"></span>
-      <button class="text-button" id="toast-action" type="button" hidden>Update</button>
+      <button class="text-button" id="toast-action" type="button" hidden>Update app</button>
     </div>
     <div class="tooltip" id="tooltip" role="tooltip" hidden></div>
+    <script src="/assets/demo-boot.35963a50.js"></script>
     <script type="module" src="/src/app.ts"></script>
   </body>
 </html>

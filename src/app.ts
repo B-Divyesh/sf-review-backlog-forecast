@@ -44,6 +44,7 @@ let selectedPolicy: PolicyId = "steady";
 let savedPlan: SavedPlan | undefined;
 let toastTimer = 0;
 let forecastStale = false;
+let inputSaveTimer = 0;
 
 document.querySelector<HTMLAnchorElement>(".skip-link")?.addEventListener("click", (event) => {
   event.preventDefault();
@@ -74,6 +75,23 @@ function download(name: string, contents: string, type: string): void {
   link.download = name;
   link.click();
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function replaceHeadingTag(selector: string, tagName: "h1" | "h2" | "p"): HTMLElement {
+  const original = $(selector);
+  if (original.tagName.toLowerCase() === tagName) return original;
+  const replacement = document.createElement(tagName);
+  for (const attribute of original.attributes) replacement.setAttribute(attribute.name, attribute.value);
+  replacement.innerHTML = original.innerHTML;
+  original.replaceWith(replacement);
+  return replacement;
+}
+
+function setDemoHeading(): void {
+  // Demo mode starts at the populated result, so its h1 must describe that
+  // destination rather than the hidden landing hero.
+  replaceHeadingTag("#page-title", "p");
+  replaceHeadingTag("#results-title", "h1");
 }
 
 function readInput(): ForecastInput {
@@ -176,7 +194,7 @@ function renderDetail(): void {
 
   const warning = $("#plan-warning");
   if (forecast.finalRollover > 0) {
-    warning.innerHTML = `<b>Regular reviews are still rolling over.</b> At this pace, ${forecast.finalRollover} non-overdue cards remain after the forecast window. Raise the cap, reduce new cards, or lower the daily-due estimate before choosing this plan.`;
+    warning.innerHTML = `<b>Regular reviews are still rolling over.</b> At this pace, ${forecast.finalRollover} regular reviews remain after the forecast window. Raise the cap, reduce new cards, or lower the regular reviews estimate before choosing this plan.`;
     warning.hidden = false;
   } else if (!forecast.onTarget) {
     warning.innerHTML = `<b>This recovery plan misses its ${forecast.goalDays}-day target.</b> It still respects your cap; the overdue queue is forecast to clear ${forecast.finishDay ? `on day ${forecast.finishDay}` : "after the visible window"}.`;
@@ -253,8 +271,23 @@ form.addEventListener("submit", (event) => {
   storage.saveInput(input).catch(() => announce("The forecast works, but this browser could not save your inputs."));
 });
 
-form.addEventListener("input", markForecastStale);
-form.addEventListener("change", markForecastStale);
+function saveEditedInput(): void {
+  window.clearTimeout(inputSaveTimer);
+  inputSaveTimer = window.setTimeout(() => {
+    const input = readInput();
+    if (validateInput(input).length > 0) return;
+    storage.saveInput(input).catch(() => announce("The forecast works, but this browser could not save your inputs."));
+  }, 200);
+}
+
+form.addEventListener("input", () => {
+  markForecastStale();
+  saveEditedInput();
+});
+form.addEventListener("change", () => {
+  markForecastStale();
+  saveEditedInput();
+});
 
 $("#load-example").addEventListener("click", () => {
   populateForm(sampleInput);
@@ -293,7 +326,7 @@ queueFile.addEventListener("change", async () => {
       ($<HTMLInputElement>("#due-today")).value = String(summary.dueToday);
       if (summary.dailyDue !== undefined) ($<HTMLInputElement>("#daily-due")).value = String(summary.dailyDue);
       markForecastStale();
-      importMessage.textContent = `Read ${summary.rowCount.toLocaleString()} ${summary.source === "summary" ? "summary row" : "card rows"}: ${summary.overdue.toLocaleString()} overdue and ${summary.dueToday.toLocaleString()} due today.${summary.dailyDue !== undefined ? ` Daily due estimate set to ${summary.dailyDue}.` : " Add your usual daily due estimate."}`;
+      importMessage.textContent = `Read ${summary.rowCount.toLocaleString()} ${summary.source === "summary" ? "summary row" : "card rows"}: ${summary.overdue.toLocaleString()} overdue and ${summary.dueToday.toLocaleString()} due today.${summary.dailyDue !== undefined ? ` Regular reviews estimate set to ${summary.dailyDue}.` : " Add your regular reviews estimate."}`;
       $("#overdue").focus();
     }
   } catch (error) {
@@ -312,15 +345,26 @@ savePlanButton.addEventListener("click", async () => {
   }
   const previous = savedPlan;
   const plan: SavedPlan = { id: crypto.randomUUID(), savedAt: new Date().toISOString(), input: currentInput, policy: selectedPolicy };
-  await storage.savePlan(plan);
-  await updateSavedStrip();
-  announce(`${POLICY_META[selectedPolicy].name} plan saved on this device.`, previous ? {
-    label: "Undo",
-    run: async () => { await storage.savePlan(previous); await updateSavedStrip(); announce("Previous plan restored."); }
-  } : {
-    label: "Undo",
-    run: async () => { await storage.clearPlan(); await updateSavedStrip(); announce("Saved plan removed."); }
-  });
+  savePlanButton.disabled = true;
+  savePlanButton.setAttribute("aria-busy", "true");
+  savePlanButton.textContent = "Saving plan…";
+  try {
+    await storage.savePlan(plan);
+    await updateSavedStrip();
+    announce(`${POLICY_META[selectedPolicy].name} plan saved on this device.`, previous ? {
+      label: "Undo",
+      run: async () => { await storage.savePlan(previous); await updateSavedStrip(); announce("Previous plan restored."); }
+    } : {
+      label: "Undo",
+      run: async () => { await storage.clearPlan(); await updateSavedStrip(); announce("Saved plan removed."); }
+    });
+  } catch {
+    announce("This browser could not save the chosen plan. Try again.");
+  } finally {
+    savePlanButton.textContent = "Use this plan";
+    savePlanButton.removeAttribute("aria-busy");
+    setForecastActionsEnabled(hasCurrentForecast());
+  }
 });
 
 $("#open-saved").addEventListener("click", () => {
@@ -403,7 +447,7 @@ async function registerServiceWorker(): Promise<void> {
   const wasControlled = Boolean(navigator.serviceWorker.controller);
   const registration = await navigator.serviceWorker.register("/sw.js");
   const showUpdate = (worker: ServiceWorker) => announce("A new version is ready.", {
-    label: "Update",
+    label: "Update app",
     run: () => worker.postMessage({ type: "SKIP_WAITING" })
   });
   if (registration.waiting) showUpdate(registration.waiting);
@@ -421,8 +465,14 @@ async function init(): Promise<void> {
     if (isDemo) {
       document.title = "Demo — Review Backlog Forecast";
       $("#demo-banner").hidden = false;
-      populateForm(sampleInput);
-      renderForecast(sampleInput, false);
+      setDemoHeading();
+      const storedInput = await storage.getInput();
+      const demoInput = storedInput && validateInput(storedInput).length === 0 ? storedInput : sampleInput;
+      populateForm(demoInput);
+      renderForecast(demoInput, false);
+      const demoHeading = $("#results-title");
+      demoHeading.tabIndex = -1;
+      demoHeading.focus({ preventScroll: true });
       await updateSavedStrip();
       $("#reset-demo").addEventListener("click", async () => {
         await storage.clearAll();
@@ -438,8 +488,8 @@ async function init(): Promise<void> {
         await storage.clearAll();
         window.location.assign("/");
       });
-      if (window.location.hash === "#guide") {
-        requestAnimationFrame(() => $("#guide").scrollIntoView({ block: "start" }));
+      if (window.location.hash === "#how-it-works") {
+        requestAnimationFrame(() => $("#how-it-works").scrollIntoView({ block: "start" }));
       }
       registerServiceWorker().catch(() => { /* App remains usable without install support. */ });
       return;

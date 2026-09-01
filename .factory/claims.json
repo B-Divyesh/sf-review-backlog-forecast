@@ -63,6 +63,13 @@
     "sandbox": "A fresh demo imports both documented row formats with grouped quantities and checks the totals."
   },
   {
+    "id": "anki-csv-steps",
+    "claim": "Provides local Anki count steps and a CSV template for import",
+    "where": "Import queue totals section and README",
+    "test": "npm run test:e2e -- --grep @claim:anki-csv-steps",
+    "sandbox": "A fresh demo opens the Anki count instructions, downloads the template, and imports a completed summary without a network request."
+  },
+  {
     "id": "offline-reload",
     "claim": "Works offline after the first visit",
     "where": "Header, offline page, privacy page, and README",
@@ -95,7 +102,14 @@
     "claim": "A chosen plan is stored in the current browser",
     "where": "Saved-plan strip, privacy page, and README",
     "test": "npm run test:e2e -- --grep @claim:local-persistence",
-    "sandbox": "A demo plan is saved, the page reloads, and the chosen plan returns from the demo IndexedDB namespace."
+    "sandbox": "A demo plan waits for the committed save confirmation, then reloads and returns from the demo database namespace."
+  },
+  {
+    "id": "input-persistence",
+    "claim": "Stores edited forecast inputs in the current browser",
+    "where": "README and privacy page",
+    "test": "npm run test:e2e -- --grep @claim:input-persistence",
+    "sandbox": "A fresh demo edits a regular-reviews estimate without saving a plan, reloads, and observes the edited input."
   },
   {
     "id": "backup-roundtrip",
@@ -110,6 +124,13 @@
     "where": "Forecast controls and README",
     "test": "npm run test:e2e -- --grep @claim:schedule-export",
     "sandbox": "The demo downloads the selected policy with the documented header and one row for every exported day."
+  },
+  {
+    "id": "daily-cards-minutes",
+    "claim": "Shows cards and minutes for each planned day",
+    "where": "README and daily ledger",
+    "test": "npm run test:e2e -- --grep @claim:daily-cards-minutes",
+    "sandbox": "The selected demo plan exposes a populated daily ledger with numeric card totals and minutes."
   },
   {
     "id": "clear-local-data",

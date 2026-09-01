@@ -20,7 +20,7 @@ export function validateInput(input: ForecastInput): string[] {
   const counts: Array<[keyof ForecastInput, string, number]> = [
     ["overdue", "Overdue cards", 100_000],
     ["dueToday", "Due today", 100_000],
-    ["dailyDue", "Usual daily due", 100_000],
+    ["dailyDue", "Regular reviews per day", 100_000],
     ["newCards", "New cards per day", 10_000]
   ];
   for (const [key, label, maximum] of counts) {

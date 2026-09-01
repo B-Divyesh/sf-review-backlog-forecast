@@ -24,9 +24,23 @@ async function transact<T>(mode: IDBTransactionMode, action: (store: IDBObjectSt
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(STORE, mode);
     const request = action(transaction.objectStore(STORE));
-    request.onsuccess = () => resolve(request.result);
+    let result: T;
+    request.onsuccess = () => { result = request.result; };
     request.onerror = () => reject(request.error ?? new Error("Local storage failed."));
-    transaction.oncomplete = () => db.close();
+    // A request may report success just before its transaction commits. Resolve
+    // only after completion so callers can safely reload after a save.
+    transaction.oncomplete = () => {
+      db.close();
+      resolve(result);
+    };
+    transaction.onerror = () => {
+      db.close();
+      reject(transaction.error ?? new Error("Local storage failed."));
+    };
+    transaction.onabort = () => {
+      db.close();
+      reject(transaction.error ?? new Error("Local storage failed."));
+    };
   });
 }
 

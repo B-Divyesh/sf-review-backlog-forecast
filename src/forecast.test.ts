@@ -90,7 +90,7 @@ describe("forecast simulation", () => {
   it("rejects every declared count maximum before simulation", () => {
     expect(validateInput({ ...base, overdue: 100_001 })).toContain("Overdue cards must be a whole number between 0 and 100,000.");
     expect(validateInput({ ...base, dueToday: 100_001 })).toContain("Due today must be a whole number between 0 and 100,000.");
-    expect(validateInput({ ...base, dailyDue: 100_001 })).toContain("Usual daily due must be a whole number between 0 and 100,000.");
+    expect(validateInput({ ...base, dailyDue: 100_001 })).toContain("Regular reviews per day must be a whole number between 0 and 100,000.");
     expect(validateInput({ ...base, newCards: 10_001 })).toContain("New cards per day must be a whole number between 0 and 10,000.");
   });
 });

@@ -1,1 +1,1 @@
-Plan an overdue queue before changing cards.
+Plan capped recovery sessions for an overdue queue.

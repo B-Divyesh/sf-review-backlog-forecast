@@ -51,7 +51,7 @@ export function parseCardCsv(text: string, today = new Date()): ImportSummary {
     return {
       overdue: safeWhole(rows[1][overdueIndex], "Overdue"),
       dueToday: safeWhole(rows[1][todayIndex], "Due today"),
-      dailyDue: dailyIndex >= 0 ? safeWhole(rows[1][dailyIndex], "Daily due") : undefined,
+      dailyDue: dailyIndex >= 0 ? safeWhole(rows[1][dailyIndex], "Regular reviews per day") : undefined,
       rowCount: 1,
       source: "summary"
     };
