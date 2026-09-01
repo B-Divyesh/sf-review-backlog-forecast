@@ -1,13 +1,14 @@
-# Copy audit — polish 1
+# Copy audit — polish 2
 
-All reviewed landing-page and README sentences are 22 words or fewer. No reviewed sentence uses a banned marketing word. The remaining uses of “backlog” are the product name and the required hero task label.
+All reviewed landing-page, legal-page, and README sentences are 22 words or fewer. No reviewed sentence uses a banned marketing word. “Backlog” appears only in the product name; the workload is always an “overdue queue.”
 
 ## Landing-page sentences
 
 | Words | Sentence |
 | ---: | --- |
-| 6 | Plan overdue reviews before changing cards. |
-| 15 | For learners returning after missed days, compare capped recovery plans before changing an Anki queue. |
+| 5 | Plan an overdue queue. |
+| 8 | Plan an overdue queue before changing cards. |
+| 15 | For learners returning after missed days, compare capped recovery plans before changing cards in Anki. |
 | 7 | See a 320-card overdue queue plan. |
 | 4 | Nothing real is saved. |
 | 4 | Nothing is rescheduled here. |
@@ -21,6 +22,7 @@ All reviewed landing-page and README sentences are 22 words or fewer. No reviewe
 | 10 | Add your overdue queue totals to compare recovery plans. |
 | 12 | You can change every assumption and rerun as often as you need. |
 | 5 | No card is ever moved. |
+| 10 | A free planning tool that keeps plans on this device. |
 
 ## README sentences
 
@@ -55,3 +57,9 @@ All reviewed landing-page and README sentences are 22 words or fewer. No reviewe
 | Missed review work | overdue queue |
 | A selected option | recovery plan |
 | Expected non-overdue work | regular reviews |
+
+## First-screen facts and footer
+
+- The desktop first trust row is ordered `Preview only`, `Stays on this device`, `Free`; the browser test checks the `Free` fact is visible at 1440 × 900.
+- The next fact is `No Anki access`. The header states `Ready offline`.
+- Every visitor footer uses `A free planning tool that keeps plans on this device.` The landing footer has no generated-image note; the required image record remains in `.factory/design.md`.

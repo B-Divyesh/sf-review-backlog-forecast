@@ -60,7 +60,7 @@ npm run test:e2e
 
 ## Privacy and architecture
 
-Vite and vanilla TypeScript produce a static PWA. It loads no third-party fonts, scripts, analytics, advertising, or runtime image service. No account or payment step is required. Inputs and the last chosen plan are stored in IndexedDB. The versioned service worker makes the app available offline after the first visit. See [the privacy page](https://review-backlog-forecast.sociobot.in/privacy/) and [the terms](https://review-backlog-forecast.sociobot.in/terms/).
+Vite and vanilla TypeScript produce a static PWA. It loads no third-party fonts, scripts, analytics, advertising, or runtime image service. No account or payment step is required. Inputs and the last chosen plan are stored in this browser’s IndexedDB. The versioned service worker makes the app available offline after the first visit. See [the privacy page](https://review-backlog-forecast.sociobot.in/privacy/) and [the terms](https://review-backlog-forecast.sociobot.in/terms/).
 
 The researched opportunity lives in `.factory/brief.json`; the product-specific visual system and generated-image provenance live in `.factory/design.md`.
 

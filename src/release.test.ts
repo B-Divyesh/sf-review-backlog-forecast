@@ -30,4 +30,18 @@ describe("release contract", () => {
       expect(config.routes.find((entry) => entry.route === route)?.headers?.["Cache-Control"]).toBe("public, max-age=31536000, immutable");
     }
   });
+
+  it("uses overdue queue as the visitor-facing workload term and keeps the free fact in the first row", () => {
+    const landing = readFileSync("index.html", "utf8");
+    expect(landing).toContain("Plan an overdue queue before changing cards.");
+    expect(landing).toContain("For learners returning after missed days, compare capped recovery plans before changing cards in Anki.");
+    expect(landing).toMatch(/<li>Preview only<\/li>\s*<li>Stays on this device<\/li>\s*<li>Free<\/li>/);
+    for (const retiredCopy of [
+      "Plan a spaced-repetition review backlog.",
+      "Plan overdue reviews before changing cards.",
+      "before changing an Anki queue",
+      "local-first planning utility",
+      "provenance in the project design notes"
+    ]) expect(landing).not.toContain(retiredCopy);
+  });
 });

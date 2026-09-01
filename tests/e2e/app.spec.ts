@@ -248,9 +248,9 @@ test("moves focus to the new route heading and announces normal navigation and B
   await expect(privacyHeading).toBeFocused();
   await expect(page.locator("#route-announcement")).toHaveText("Keep your queue on your device. loaded.");
   await page.goBack();
-  const demoHeading = page.getByRole("heading", { name: "Plan overdue reviews before changing cards." });
+  const demoHeading = page.getByRole("heading", { name: "Plan an overdue queue before changing cards." });
   await expect(demoHeading).toBeFocused();
-  await expect(page.locator("#route-announcement")).toHaveText("Plan overdue reviews before changing cards. loaded.");
+  await expect(page.locator("#route-announcement")).toHaveText("Plan an overdue queue before changing cards. loaded.");
 });
 
 test("has no serious accessibility violations", async ({ page }) => {
@@ -281,7 +281,7 @@ test("@claim:offline-reload reloads the demo forecast while offline after the ap
     await context.setOffline(true);
     await page.reload();
     await expect(page).toHaveTitle("Demo — Review Backlog Forecast");
-    await expect(page.getByRole("heading", { name: "Plan overdue reviews before changing cards." })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Plan an overdue queue before changing cards." })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Three recovery plans" })).toBeVisible();
   } finally {
     await context.close();
@@ -454,12 +454,15 @@ test("serves unknown routes as the styled 404 with an HTTP 404 status", async ({
 });
 
 test("publishes route metadata, shared legal chrome, and build identity", async ({ page, request }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", /recovery-console-social\.[a-f0-9]{8}\.jpg$/);
   await expect(page.locator('meta[property="og:image:width"]')).toHaveAttribute("content", "1200");
   await expect(page.locator('meta[property="og:image:height"]')).toHaveAttribute("content", "630");
   await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
-  await expect(page.locator(".trust-list")).toContainText("Free");
+  const freeFact = page.locator(".trust-list li", { hasText: "Free" });
+  await expect(freeFact).toBeVisible();
+  expect((await freeFact.boundingBox())?.y ?? Number.POSITIVE_INFINITY).toBeLessThan(880);
   await page.goto("/?demo=1");
   await expect(page).toHaveTitle("Demo — Review Backlog Forecast");
 
@@ -467,7 +470,7 @@ test("publishes route metadata, shared legal chrome, and build identity", async 
     await page.goto(route);
     await expect(page.getByRole("banner").getByRole("link", { name: "Review Backlog Forecast home" })).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
-    await expect(page.getByRole("contentinfo")).toContainText("Built by Param Factory · Build 1.0.4");
+    await expect(page.getByRole("contentinfo")).toContainText("Built by Param Factory · Build 1.0.5");
   }
   for (const [route, title, canonical] of [
     ["/offline.html", "Offline — Review Backlog Forecast", "https://review-backlog-forecast.sociobot.in/offline.html"],
@@ -516,7 +519,7 @@ test("activates a waiting service-worker update without losing the demo", async 
   cpSync("dist", fixture, { recursive: true });
   const workerPath = join(fixture, "sw.js");
   const originalWorker = readFileSync(workerPath, "utf8");
-  expect(originalWorker).toContain('const VERSION = "rbf-v1.0.4"');
+  expect(originalWorker).toContain('const VERSION = "rbf-v1.0.5"');
   const server = await startStaticServer(fixture);
   const context = await browser.newContext();
   const page = await context.newPage();
@@ -528,11 +531,11 @@ test("activates a waiting service-worker update without losing the demo", async 
         await new Promise<void>((resolve) => navigator.serviceWorker.addEventListener("controllerchange", () => resolve(), { once: true }));
       }
     });
-    writeFileSync(workerPath, originalWorker.replace("rbf-v1.0.4", "rbf-v1.0.5"));
+    writeFileSync(workerPath, originalWorker.replace("rbf-v1.0.5", "rbf-v1.0.6"));
     await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration())?.update(); });
     await expect(page.getByText("A new version is ready.")).toBeVisible();
     await page.getByRole("button", { name: "Update" }).click();
-    await page.waitForFunction(async () => (await caches.keys()).includes("rbf-v1.0.5-shell"));
+    await page.waitForFunction(async () => (await caches.keys()).includes("rbf-v1.0.6-shell"));
     await expect(page.getByRole("heading", { name: "Three recovery plans" })).toBeVisible();
   } finally {
     await context.close();
