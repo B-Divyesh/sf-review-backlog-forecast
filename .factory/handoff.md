@@ -1,30 +1,47 @@
-# Handoff — adversarial first-read review 2
+# Handoff — polish 2
 
 ## Status
 
-**FAIL.** This review made documentation-only changes. The live product was not changed.
+**PASS.** Commit `44773a4` is pushed to `main` and deployed as build `1.0.5` at <https://review-backlog-forecast.sociobot.in/>.
 
-## What was done
+## What changed
 
-- Reviewed the live product in fresh 390 × 844 mobile and 1440 × 900 desktop contexts.
-- Confirmed the first-read message, one-click sample, demo reset, separate demo storage, request origins, offline reload, route focus, metadata, 404, headers, link targets, and console state.
-- Read the brief, design record, claims registry, earlier review, polish record, and prior handoff.
-- Created a fresh local clone, ran all 20 exact claim commands one at a time, and ran the full quality suite.
-- Recorded the complete result in `.factory/review-2.md`.
+- Completed all findings in `.factory/review-1.md` and `.factory/review-2.md`; the complete mapping is in `.factory/polish-2.md`.
+- Standardized the first screen, metadata, and audit on `overdue queue`; the h1 is now `Plan an overdue queue before changing cards.`
+- Moved `Free` into the first desktop trust row and added a 1440 × 900 regression assertion.
+- Replaced unexplained `local-first` footer wording on every route and removed the visitor-facing image-provenance sentence.
+- Preserved the isolated `?demo=1` workflow, reset/start-real controls, IndexedDB namespace separation, existing claims, routing, 404, focus handoff, legal pages, PWA behavior, and visual system.
+- Bumped the PWA/service-worker and manifest version to `1.0.5` so installed clients receive the repaired shell.
 
-## Verification commands
+## Verification
+
+Fresh clone `/tmp/review-backlog-forecast-clean-c55J7l`:
 
 ```sh
 npm ci
-npm test
-npm run lint
-npm run typecheck
-npm run build
-npm run test:e2e
+npm test                 # 19 passed
+npm run lint             # passed
+npm run typecheck        # passed
+npm run build            # passed; dist/ produced
+npm run test:e2e         # 60 passed
 ```
 
-Open <https://review-backlog-forecast.sociobot.in/?demo=1> to check the isolated sample flow.
+All 20 exact commands in `.factory/claims.json` passed independently in that clone. The browser suite covers Axe, privacy request origins, demo isolation, offline reload, service-worker update, 390 px layout, controls, routing, and 404.
 
-## Known gaps and next steps
+Deployment used the owned Static Web App only:
 
-The product has four copy/layout findings in `.factory/review-2.md`. The blocking item is the incomplete repair of F-1-15: visitor copy still uses several terms for the same overdue workload. The price fact also falls below the 900 px desktop first view, and two footer phrases use unnecessary jargon. Resolve those items and repeat the complete first-read and claim review.
+```sh
+swa deploy ./dist --env production
+```
+
+Cold live evidence:
+
+- `/opt/fleet/lib/verify-url.sh https://review-backlog-forecast.sociobot.in/?demo=1 .factory/evidence/polish-2` passed: 789 ms, no console/page errors, `lang=en`, one h1, main landmark, no missing alt text, no unnamed buttons.
+- Fresh live Playwright check: desktop `Free` fact y = `866.5px` in a 1440 × 900 viewport; mobile has no page overflow; zero serious/critical Axe violations; `/privacy/` and `/terms/` return 200; an unknown path returns 404.
+- Live demo reset restored the sample `320` overdue queue. Privacy navigation and Back focused their new h1s.
+
+Screenshots: `.factory/evidence/polish-2/live-desktop-root.png` and `.factory/evidence/polish-2/live-mobile-demo.png`.
+
+## Known gaps
+
+None.
