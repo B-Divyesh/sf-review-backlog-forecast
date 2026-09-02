@@ -1,3 +1,19 @@
+# Review 6 handoff — PASS
+
+Independent adversarial review completed without product-code changes.
+
+- Fresh 390 × 844 mobile and 1440 × 900 desktop live checks confirmed the
+  first-screen job, audience, action, immediate sample result, reset, route
+  focus/Back, metadata, 404, responsive layout, and same-origin requests.
+- A separate clone at `/tmp/review-backlog-forecast-review6-z2TzIz` ran every
+  exact command in `.factory/claims.json`; all 28 passed. `npm test` (23),
+  lint, typecheck, and build also passed.
+- `.factory/review-6.md` records the complete PASS review. No defects or known
+  gaps were found. Reproduce with `npm ci`, the 28 claim commands, and fresh
+  browser visits to `/` and `/demo/`.
+
+---
+
 # Verification 15 handoff — PASS
 
 Candidate `c9aaba416fc3d30607c3b120a6e9462b2e7fbeda` is accepted at <https://review-backlog-forecast.sociobot.in>.
