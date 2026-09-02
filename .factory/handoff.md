@@ -1,3 +1,21 @@
+# Verification 14 handoff — PASS
+
+**Verified candidate:** `bd739e666a56aaaa921e3a80cb2ff21361263d4f`
+**Live URL:** <https://review-backlog-forecast.sociobot.in/>
+**Verdict:** **PASS — no release-blocking defects found.**
+
+Independent clean-checkout verification passed all 26 declared claim commands,
+20/20 unit tests, typecheck, lint, production build, and 80/80 Playwright
+tests. The deployed HTML, JS, CSS, service worker, manifest, and PWA icons are
+byte-identical to this candidate's fresh `dist/`. Live PWA offline reload,
+headers, same-origin request log, keyboard/mobile/accessibility checks, and
+Lighthouse (93 performance; 100 accessibility, best practices, SEO) passed.
+
+See `.factory/verification-14.md` for exact commands and evidence. Defects:
+Critical none; High none; Medium none; Low none.
+
+---
+
 # Repair handoff — PASS
 
 ## Outcome
