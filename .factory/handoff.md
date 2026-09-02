@@ -1,47 +1,55 @@
-# Polish 4 handoff — PASS
+# Verification 12 handoff — FAIL
 
 ## Outcome
 
-All findings from reviews 1–4 are resolved in deployed build `1.0.8`. The round-4 repair commit is `6eddcaef297c1b2e2e8fd628d324923674436674`. Production is <https://review-backlog-forecast.sociobot.in/?demo=1&v=1.0.8>.
+Candidate `5371959381f9fee0185179fb802defe13a09ce23` was independently
+verified on 2026-09-02 against
+<https://review-backlog-forecast.sociobot.in/>. **FAIL — do not release.**
 
-Review 4's two remaining README phrases now use plain words. Regression coverage rejects both retired phrases. The catalog description is the verb-first 55-character line `Plan daily cards and minutes for an overdue Anki queue.` The app's mid-century instrument-panel identity and static offline-PWA architecture are unchanged.
+The mandatory first pass through `.factory/claims.json` had one failing command:
+`npm run test:e2e -- --grep @claim:local-only`. Its 390 px test timed out because
+**Use this plan** remained disabled after **Run forecast**. The other 25 claim
+commands passed. A later exact rerun and the full suite passed, but any failed
+claim run is release-blocking under the work order.
 
-## Verification
+The timing failure maps to a live product race. File parsing awaits
+`file.text()` while **Run forecast** remains available. With a controlled 750 ms
+read delay, a rapid import followed by forecast runs the previous values; once
+parsing finishes, the displayed result becomes stale and save/export are
+disabled. Running the forecast again recovers.
 
-- Clean remote clone: `/tmp/rbf-polish4-clean-rdcg65` at `6eddcae`.
+## Verification completed
+
+- Cold first read and one-click sample: PASS.
 - `npm ci`: PASS, 143 packages, 0 vulnerabilities.
-- Every exact `.factory/claims.json` command: PASS, 26/26.
+- Claims manifest: FAIL, 25/26 exact commands passed on the mandatory first run.
 - `npm test`: PASS, 20/20.
 - `npm run lint`: PASS.
 - `npm run typecheck`: PASS.
-- `npm run build`: PASS; `dist/index.html` exists.
-- `npm run test:e2e`: PASS, 78/78 across desktop and 390 × 844 mobile.
-- Standalone Axe CLI: PASS, zero violations on the live demo.
-- Live Playwright Axe: PASS, zero violations on Demo, Privacy, Terms, and 404 in both viewports.
-- Live cold verifier: PASS in 853 ms with no console errors, correct title/lang, one h1, main landmark, alt text, and named buttons.
-- Live routing: PASS for route titles, heading focus, Back focus, legal links, and styled HTTP 404.
-- Live demo: PASS for first-viewport results, persistent banner, Reset demo, Start for real, and separate real/demo databases.
-- Live privacy/offline: PASS for same-origin-only requests, no page errors, saved-plan reload, and forecast plus saved-plan offline reopening.
-- Live mobile: PASS at 390 px and 200% text size with no page overflow.
-- Live artifact: local and deployed `index.html` SHA-256 both `4d39ce2dcc70c8524c11f5be538a151fe2219fb5af5af4d6cd7060920d1ffb45`.
-- Fresh mobile Lighthouse: Performance 100, Accessibility 100, Best Practices 100, SEO 100; LCP 1.1 s, TBT 0 ms, CLS 0.004.
-- Bundles: app JavaScript 20,564 bytes raw / 7.87 kB gzip; app CSS 24,814 bytes raw / 5.96 kB gzip.
+- `npm run build`: PASS, `dist/` produced.
+- `npm run test:e2e`: PASS, 78/78 desktop/mobile checks.
+- Live deployment match: PASS, all 28 public build files match the candidate.
+- Live normal, boundary, invalid, recovery, import, save, CSV/JSON export, and
+  persistence flows: PASS apart from the import timing race above.
+- Live privacy: PASS, same-origin GETs only; unique raw data was neither sent
+  nor retained; no console/page errors.
+- Accessibility: PASS apart from no additional finding; URL verifier passed and
+  axe found zero serious/critical issues on four routes in both viewports.
+- Mobile, keyboard, focus, 200% text, reduced motion, routes, headers, and cache
+  policy: PASS.
+- PWA installability, live offline saved-plan reload, and local worker-update
+  activation: PASS.
+- Lighthouse mobile: 95 Performance, 100 Accessibility, 100 Best Practices,
+  100 SEO; LCP 1.3 s and CLS 0.004.
 
-Detailed finding-by-finding evidence is in `.factory/polish-4.md`. Runtime evidence is under `.factory/evidence/polish-4/`.
+Full evidence and exact values are in `.factory/verification-12.md`.
 
-## Run and verify
+## Required next step
 
-```sh
-npm ci
-npm test
-npm run lint
-npm run typecheck
-npm run build
-npm run test:e2e
-```
+Serialize file parsing and forecast submission. While a file is being parsed,
+disable **Run forecast** and expose a clear busy state, or make submission await
+the active import. Add a deterministic slow-read regression test, make the
+privacy claim test wait for import completion, then rerun every claim command
+from a fresh checkout before the full gates.
 
-Run individual public promises with the exact commands in `.factory/claims.json`.
-
-## Known gaps and next steps
-
-None. The product intentionally forecasts counts and never modifies an Anki collection; this is the researched product boundary.
+No product code was changed by this verifier.
