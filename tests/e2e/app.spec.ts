@@ -144,12 +144,16 @@ test("invalidates stale forecast actions after edits, imports, and rejected subm
   await expect(exportPlan).toBeDisabled();
 });
 
-test("disables forecasting until a delayed file import finishes", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+test("disables forecasting until a controlled file import finishes", async ({ page }) => {
   await page.addInitScript(() => {
     const originalText = File.prototype.text;
+    let releaseFileText: () => void = () => undefined;
+    const fileTextBarrier = new Promise<void>((resolve) => {
+      releaseFileText = resolve;
+    });
+    (window as Window & { releaseFileText: () => void }).releaseFileText = releaseFileText;
     File.prototype.text = function () {
-      return new Promise<void>((resolve) => window.setTimeout(resolve, 750)).then(() => originalText.call(this));
+      return fileTextBarrier.then(() => originalText.call(this));
     };
   });
   await page.goto("/?demo=1");
@@ -174,6 +178,7 @@ test("disables forecasting until a delayed file import finishes", async ({ page 
   await expect(savePlan).toBeDisabled();
   await expect(page.locator("#overdue")).toHaveValue("320");
 
+  await page.evaluate(() => (window as Window & { releaseFileText: () => void }).releaseFileText());
   await expect(page.locator("#import-message")).toContainText("2 overdue and 1 due today");
   await expect(page.locator("#overdue")).toHaveValue("2");
   await expect(runForecast).toBeEnabled();
