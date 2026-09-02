@@ -416,6 +416,7 @@ main { display: block; }
 
 .file-button small { color: var(--muted); font-family: var(--numeric); font-size: 0.7rem; font-weight: 400; }
 .file-button:hover { background: var(--paper-deep); }
+.file-button.is-busy { cursor: progress; opacity: 0.72; }
 .file-button:focus-within { outline: 3px solid var(--focus-between); outline-offset: 3px; }
 
 .text-button {

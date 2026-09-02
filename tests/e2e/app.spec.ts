@@ -144,6 +144,44 @@ test("invalidates stale forecast actions after edits, imports, and rejected subm
   await expect(exportPlan).toBeDisabled();
 });
 
+test("disables forecasting until a delayed file import finishes", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => {
+    const originalText = File.prototype.text;
+    File.prototype.text = function () {
+      return new Promise<void>((resolve) => window.setTimeout(resolve, 750)).then(() => originalText.call(this));
+    };
+  });
+  await page.goto("/?demo=1");
+
+  const runForecast = page.getByRole("button", { name: "Run forecast" });
+  const savePlan = page.getByRole("button", { name: "Use this plan" });
+  await page.locator("#queue-file").setInputFiles({
+    name: "delayed-summary.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from("overdue,due_today,daily_due\n2,1,1\n")
+  });
+
+  await expect(page.locator("#import-message")).toContainText("Reading delayed-summary.csv");
+  await expect(runForecast).toBeDisabled();
+  await expect(runForecast).toHaveAttribute("aria-busy", "true");
+  await expect(page.locator("#forecast-form")).toHaveAttribute("aria-busy", "true");
+  await expect(savePlan).toBeDisabled();
+
+  // A submitted form event cannot calculate the old demo values while the
+  // browser is still reading the selected file.
+  await page.locator("#forecast-form").evaluate((form) => form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })));
+  await expect(savePlan).toBeDisabled();
+  await expect(page.locator("#overdue")).toHaveValue("320");
+
+  await expect(page.locator("#import-message")).toContainText("2 overdue and 1 due today");
+  await expect(page.locator("#overdue")).toHaveValue("2");
+  await expect(runForecast).toBeEnabled();
+  await expect(runForecast).not.toHaveAttribute("aria-busy", "true");
+  await page.getByRole("button", { name: "Run forecast" }).click();
+  await expect(savePlan).toBeEnabled();
+});
+
 test("keeps focus on the selected policy radio through repeated arrow navigation", async ({ page }) => {
   await page.goto("/?demo=1");
   const steady = page.getByRole("radio", { name: /^Steady/ });
@@ -450,6 +488,7 @@ test("@claim:local-only neither uploads nor retains raw imported card content", 
     mimeType: "text/csv",
     buffer: Buffer.from(`card,days_overdue,count\n${privateMarker},8,2\n`)
   });
+  await expect(page.locator("#import-message")).toContainText("2 overdue and 0 due today");
   await page.getByRole("button", { name: "Run forecast" }).click();
   await page.getByRole("button", { name: "Use this plan" }).click();
   await page.locator("#queue-file").setInputFiles({
@@ -460,6 +499,7 @@ test("@claim:local-only neither uploads nor retains raw imported card content", 
       input: { overdue: 2, dueToday: 1, dailyDue: 1, newCards: 0, secondsPerCard: 12, capMinutes: 30, deadlineDays: 14, studyDays: 6 }
     }))
   });
+  await expect(page.locator("#import-message")).toContainText("Local backup restored. Run the forecast to review it.");
   const retained = await page.evaluate(async () => {
     const records = await new Promise<unknown[]>((resolve, reject) => {
       const request = indexedDB.open("review-backlog-forecast-demo");
@@ -727,7 +767,7 @@ test("publishes route metadata, shared legal chrome, and build identity", async 
     await page.goto(route);
     await expect(page.getByRole("banner").getByRole("link", { name: "Review Backlog Forecast home" })).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
-    await expect(page.getByRole("contentinfo")).toContainText("Built by Param Factory · Build 1.0.8");
+    await expect(page.getByRole("contentinfo")).toContainText("Built by Param Factory · Build 1.0.9");
   }
   for (const [route, title, canonical] of [
     ["/", "Review Backlog Forecast — Plan an overdue queue", "https://review-backlog-forecast.sociobot.in/"],
@@ -787,7 +827,7 @@ test("activates a waiting service-worker update without losing the demo", async 
   cpSync("dist", fixture, { recursive: true });
   const workerPath = join(fixture, "sw.js");
   const originalWorker = readFileSync(workerPath, "utf8");
-  expect(originalWorker).toContain('const VERSION = "rbf-v1.0.8"');
+  expect(originalWorker).toContain('const VERSION = "rbf-v1.0.9"');
   const server = await startStaticServer(fixture);
   const context = await browser.newContext();
   const page = await context.newPage();
@@ -799,11 +839,11 @@ test("activates a waiting service-worker update without losing the demo", async 
         await new Promise<void>((resolve) => navigator.serviceWorker.addEventListener("controllerchange", () => resolve(), { once: true }));
       }
     });
-    writeFileSync(workerPath, originalWorker.replace("rbf-v1.0.8", "rbf-v1.0.9"));
+    writeFileSync(workerPath, originalWorker.replace("rbf-v1.0.9", "rbf-v1.0.10"));
     await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration())?.update(); });
     await expect(page.getByText("A new version is ready.")).toBeVisible();
     await page.getByRole("button", { name: "Update app" }).click();
-    await page.waitForFunction(async () => (await caches.keys()).includes("rbf-v1.0.9-shell"));
+    await page.waitForFunction(async () => (await caches.keys()).includes("rbf-v1.0.10-shell"));
     await expect(page.getByRole("heading", { name: "Three recovery plans" })).toBeVisible();
   } finally {
     await context.close();

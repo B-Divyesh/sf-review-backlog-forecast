@@ -24,6 +24,7 @@ const toastAction = $<HTMLButtonElement>("#toast-action");
 const main = $("#main");
 const savePlanButton = $<HTMLButtonElement>("#save-plan");
 const exportPlanButton = $<HTMLButtonElement>("#export-plan");
+const runForecastButton = $<HTMLButtonElement>("#run-forecast");
 const forecastStatus = $("#forecast-status");
 const isDemo = new URLSearchParams(window.location.search).get("demo") === "1";
 
@@ -45,6 +46,7 @@ let savedPlan: SavedPlan | undefined;
 let toastTimer = 0;
 let forecastStale = false;
 let inputSaveTimer = 0;
+let importInProgress = false;
 
 document.querySelector<HTMLAnchorElement>(".skip-link")?.addEventListener("click", (event) => {
   event.preventDefault();
@@ -122,6 +124,20 @@ function populateForm(input: ForecastInput): void {
 function setForecastActionsEnabled(enabled: boolean): void {
   savePlanButton.disabled = !enabled;
   exportPlanButton.disabled = !enabled;
+}
+
+function setImportInProgress(inProgress: boolean): void {
+  importInProgress = inProgress;
+  queueFile.disabled = inProgress;
+  runForecastButton.disabled = inProgress;
+  if (inProgress) {
+    runForecastButton.setAttribute("aria-busy", "true");
+    form.setAttribute("aria-busy", "true");
+  } else {
+    runForecastButton.removeAttribute("aria-busy");
+    form.removeAttribute("aria-busy");
+  }
+  document.querySelector<HTMLLabelElement>('label[for="queue-file"]')?.classList.toggle("is-busy", inProgress);
 }
 
 function hasCurrentForecast(): boolean {
@@ -259,6 +275,9 @@ async function updateSavedStrip(): Promise<void> {
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
+  // The submit control is disabled while parsing. Keep this guard as well for
+  // Enter presses or programmatic submissions that bypass the disabled button.
+  if (importInProgress) return;
   form.classList.add("was-validated");
   const input = readInput();
   const errors = validateInput(input);
@@ -299,12 +318,16 @@ $("#load-example").addEventListener("click", () => {
 queueFile.addEventListener("change", async () => {
   const file = queueFile.files?.[0];
   if (!file) return;
-  if (file.size > 2_000_000) {
-    importMessage.textContent = "That file is over 2 MB. Use a smaller export or enter totals manually.";
-    queueFile.value = "";
-    return;
-  }
+  // A forecast must never be calculated from the values that happened to be
+  // in the form before this asynchronous read completes.
+  setImportInProgress(true);
+  markForecastStale();
+  importMessage.textContent = `Reading ${file.name}. Run forecast is unavailable until the import finishes.`;
   try {
+    if (file.size > 2_000_000) {
+      importMessage.textContent = "That file is over 2 MB. Use a smaller export or enter totals manually.";
+      return;
+    }
     const contents = await file.text();
     if (file.name.toLowerCase().endsWith(".json")) {
       const backup = JSON.parse(contents) as { input?: ForecastInput; plan?: SavedPlan };
@@ -333,6 +356,7 @@ queueFile.addEventListener("change", async () => {
     importMessage.textContent = error instanceof Error ? error.message : "This file could not be read. Check the format and try again.";
   } finally {
     queueFile.value = "";
+    setImportInProgress(false);
   }
 });
 
