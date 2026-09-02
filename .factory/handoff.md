@@ -1,3 +1,33 @@
+# Review 4 handoff — FAIL
+
+## What was done
+
+Completed the mandated adversarial first-read review without changing product
+code. Added `.factory/review-4.md` and checked the deployed product in fresh
+390 × 844 mobile and 1440 × 900 desktop browser contexts.
+
+## Verification
+
+- Cold landing and one-click demo were clear and functional. The populated
+  sample, demo banner, Reset demo, and Start for real controls appeared
+  immediately after the one-click entry.
+- From a clean checkout, `npm ci`, `npm test` (19/19), lint, typecheck, build,
+  and `npm run test:e2e` (78/78) passed. The full browser suite executed every
+  registered browser-claim assertion in desktop and mobile; all seven tagged
+  unit claims passed.
+- Live routing, titles, metadata, 404, links, focus handoff, visual identity,
+  request behavior, privacy coverage, and demo isolation were checked. No
+  product-code issue was found.
+
+## Left to do
+
+The review verdict is **FAIL** because two minor README plain-language findings
+remain: replace `PWA/service-worker behavior` with `offline behavior`, and
+replace `generated-image provenance` with `image source record`. See
+`.factory/review-4.md` for exact locations and rewrites.
+
+---
+
 # Verification 11 handoff — PASS
 
 ## Status
