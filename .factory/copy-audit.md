@@ -1,4 +1,4 @@
-# Copy audit — polish 4
+# Copy audit — polish 5
 
 Checked 2026-09-02. The landing, demo, legal routes, and README use no banned marketing terms. Each audited sentence is 22 words or fewer. Product-name occurrences of “Backlog” are retained only as the proper name **Review Backlog Forecast**.
 
@@ -36,10 +36,13 @@ Checked 2026-09-02. The landing, demo, legal routes, and README use no banned ma
 | 10 | It says when the deadline cannot fit within your cap. |
 | 6 | Starts at half the Steady allowance. |
 | 9 | It reaches the full allowance after five study sessions. |
+| 5 | Today stays in the plan. |
 | 10 | Due-today and estimated regular reviews get capacity before overdue cards. |
+| 5 | One pace for every card. |
 | 7 | Minutes are card count × your seconds-per-review estimate. |
+| 5 | Rest days add regular reviews. |
 | 8 | Unreviewed regular reviews roll forward and stay visible. |
-| 9 | Future intervals, retention, lapses, and FSRS changes remain unknown. |
+| 9 | Future intervals, retention, lapses, and scheduler changes remain unknown. |
 | 8 | Edit a marked estimate, then rerun the forecast. |
 | 5 | No card is ever moved. |
 | 10 | A free planning tool that keeps plans on this device. |
@@ -50,7 +53,8 @@ Checked 2026-09-02. The landing, demo, legal routes, and README use no banned ma
 | ---: | --- |
 | 16 | Review Backlog Forecast is a free planning utility for spaced-repetition learners returning to an overdue queue. |
 | 10 | It compares three recovery plans before the learner changes anything. |
-| 18 | Try the complete sample at `/?demo=1`, or use **Try it with sample data** on the first screen. |
+| 15 | Try the complete sample at `/demo/`, or use **Try it with sample data** on the first screen. |
+| 7 | `?demo=1` also opens the isolated sample. |
 | 12 | The demo opens a 320-card overdue queue in its own browser database. |
 | 7 | It never reads or changes real plans. |
 | 9 | Steady uses the same overdue allowance each study session. |
@@ -76,7 +80,8 @@ Checked 2026-09-02. The landing, demo, legal routes, and README use no banned ma
 | 9 | The selected daily schedule exports as CSV for reference. |
 | 7 | Schedule CSVs are not Anki rescheduling files. |
 | 8 | Vite and TypeScript produce an installable offline web app. |
-| 12 | It loads no third-party fonts, scripts, analytics, advertising, or runtime image service. |
+| 10 | It loads no third-party fonts, scripts, analytics, or advertising. |
+| 9 | It does not fetch images from another service. |
 | 7 | No account or payment step is required. |
 | 12 | Inputs and the last chosen plan stay in this browser’s local database. |
 | 14 | After the first visit, the browser’s offline cache keeps the app available without a connection. |
@@ -85,7 +90,7 @@ Checked 2026-09-02. The landing, demo, legal routes, and README use no banned ma
 | 18 | The exact deploy command is `npm run build`; static output lands in `dist/` with `dist/index.html` at its root. |
 | 11 | `npm run test:e2e` builds the production app before starting Playwright. |
 | 15 | The suite checks desktop and 390px mobile layouts, keyboard use, accessibility, privacy, persistence, and exports. |
-| 15 | It also checks offline reopening, updates, metadata, 404 behavior, touch targets, and startup layout shift. |
+| 17 | It also checks offline reopening, updates, page details, 404 behavior, touch targets, and content movement while loading. |
 | 13 | Every visitor-facing product claim and its exact test command is listed in `.factory/claims.json`. |
 | 8 | The isolated test data is documented in `.factory/demo.md`. |
 | 7 | See the privacy page and the terms. |
@@ -102,4 +107,4 @@ Checked 2026-09-02. The landing, demo, legal routes, and README use no banned ma
 | A learner’s selected option | recovery plan |
 | Expected non-overdue work | regular reviews |
 
-The terminology regression test reads landing, README, legal pages, manifest, and visitor-facing runtime copy. It rejects the retired phrases `Usual daily due`, `estimated normal reviews`, `regular-review rollover`, `daily-due estimate`, and `spaced-repetition backlog`.
+The terminology regression test reads landing, README, legal pages, manifest, and visitor-facing runtime copy. It rejects the retired phrases `Usual daily due`, `estimated normal reviews`, `regular-review rollover`, `daily-due estimate`, `spaced-repetition backlog`, and `FSRS changes`.

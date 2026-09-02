@@ -61,7 +61,8 @@ describe("release contract", () => {
       "estimated normal reviews",
       "regular-review rollover",
       "daily-due estimate",
-      "spaced-repetition backlog"
+      "spaced-repetition backlog",
+      "FSRS changes"
     ]) expect(visitorCopy).not.toContain(retiredCopy);
   });
 
@@ -70,8 +71,20 @@ describe("release contract", () => {
     const catalog = readFileSync(".factory/catalog-description.txt", "utf8").trim();
     expect(readme).toContain("To test offline behavior, use a production build:");
     expect(readme).toContain("The visual system and image source record are in `.factory/design.md`.");
-    expect(readme).not.toMatch(/PWA\/service-worker behavior|generated-image provenance/);
+    expect(readme).toContain("It does not fetch images from another service.");
+    expect(readme).toContain("It also checks offline reopening, updates, page details, 404 behavior, touch targets, and content movement while loading.");
+    expect(readme).not.toMatch(/PWA\/service-worker behavior|generated-image provenance|runtime image service|startup layout shift/);
     expect(catalog.length).toBeLessThanOrEqual(120);
     expect(catalog).toMatch(/^(Plan|Compare)\b/);
+  });
+
+  it("ships a static demo document and names the save action by its result", () => {
+    const landing = readFileSync("index.html", "utf8");
+    const viteConfig = readFileSync("vite.config.ts", "utf8");
+    expect(landing).toContain('href="/demo/">Try it with sample data');
+    expect(landing).toContain('id="save-plan" type="button">Save this plan');
+    expect(landing).not.toContain("Use this plan");
+    expect(viteConfig).toContain("https://review-backlog-forecast.sociobot.in/demo/");
+    expect(readFileSync("public/sitemap.xml", "utf8")).toContain("https://review-backlog-forecast.sociobot.in/demo/");
   });
 });

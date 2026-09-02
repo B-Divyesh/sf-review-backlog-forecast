@@ -10,7 +10,7 @@ function focusRouteHeading(): void {
 
   heading.tabIndex = -1;
   heading.focus({ preventScroll: true });
-  if (announcement) announcement.textContent = `${heading.textContent?.trim() ?? "Page"} loaded.`;
+  if (announcement) announcement.textContent = `Page loaded: ${heading.textContent?.trim() ?? "Page"}`;
 }
 
 window.addEventListener("pageshow", () => {

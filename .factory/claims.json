@@ -14,6 +14,20 @@
     "sandbox": "Every day under every policy is checked against the sample's 30-minute cap."
   },
   {
+    "id": "minutes-formula",
+    "claim": "Calculates minutes from planned cards and the seconds-per-review estimate",
+    "where": "Forecast assumptions, capacity readout, and terms",
+    "test": "npm test -- -t @claim:minutes-formula",
+    "sandbox": "Fixed forecasts check every displayed model-day calculation, including 150 cards at 12 seconds equaling 30 minutes."
+  },
+  {
+    "id": "rest-day-accrual",
+    "claim": "Adds regular reviews on configured rest days",
+    "where": "Forecast assumptions",
+    "test": "npm test -- -t @claim:rest-day-accrual",
+    "sandbox": "A six-day study sample checks that a rest day adds regular reviews without reviewing them."
+  },
+  {
     "id": "due-today-priority",
     "claim": "Schedules due-today work before overdue recovery",
     "where": "Forecast explanation, terms, and README",

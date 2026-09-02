@@ -31,6 +31,29 @@ describe("forecast simulation", () => {
     }
   });
 
+  it("@claim:minutes-formula calculates minutes from cards and seconds per review", () => {
+    const fullCapacity = simulatePolicy({ ...base, overdue: 1_000, dueToday: 0, dailyDue: 0, deadlineDays: 2, studyDays: 7 }, "deadline", new Date("2026-08-27T12:00:00"));
+    const samplePeak = fullCapacity.days.find((day) => day.totalReviewed === 150);
+    expect(samplePeak?.minutes).toBe(30);
+
+    for (const input of [
+      { ...base, capMinutes: 20, secondsPerCard: 12 },
+      { ...base, capMinutes: 25, secondsPerCard: 15 },
+      { ...base, capMinutes: 17, secondsPerCard: 17 }
+    ]) {
+      const forecast = simulatePolicy(input, "deadline", new Date("2026-08-27T12:00:00"));
+      for (const day of forecast.days) {
+        expect(day.minutes).toBe(Math.round(((day.totalReviewed * input.secondsPerCard) / 60) * 10) / 10);
+      }
+    }
+  });
+
+  it("@claim:rest-day-accrual adds regular reviews on a configured rest day", () => {
+    const forecast = simulatePolicy(base, "steady", new Date("2026-08-27T12:00:00"));
+    const restDay = forecast.days.find((day) => !day.studyDay);
+    expect(restDay).toMatchObject({ regularAdded: base.dailyDue, regularReviewed: 0, regularRollover: base.dailyDue });
+  });
+
   it("@claim:due-today-priority protects due-today cards before overdue recovery", () => {
     const constrained = { ...base, dueToday: 100, overdue: 100, capMinutes: 20, secondsPerCard: 12 };
     const firstDay = simulatePolicy(constrained, "deadline").days[0];

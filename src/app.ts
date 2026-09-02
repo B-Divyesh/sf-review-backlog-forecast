@@ -2,6 +2,7 @@ import "./style.css";
 import "./route-focus";
 import { parseCardCsv, SUMMARY_TEMPLATE } from "./csv";
 import { POLICY_META, simulateAll, validateInput } from "./forecast";
+import { isDemoLocation } from "./mode";
 import { storage } from "./storage";
 import type { ForecastInput, PolicyForecast, PolicyId, SavedPlan } from "./types";
 
@@ -26,7 +27,7 @@ const savePlanButton = $<HTMLButtonElement>("#save-plan");
 const exportPlanButton = $<HTMLButtonElement>("#export-plan");
 const runForecastButton = $<HTMLButtonElement>("#run-forecast");
 const forecastStatus = $("#forecast-status");
-const isDemo = new URLSearchParams(window.location.search).get("demo") === "1";
+const isDemo = isDemoLocation();
 
 const sampleInput: ForecastInput = {
   overdue: 320,
@@ -385,7 +386,7 @@ savePlanButton.addEventListener("click", async () => {
   } catch {
     announce("This browser could not save the chosen plan. Try again.");
   } finally {
-    savePlanButton.textContent = "Use this plan";
+    savePlanButton.textContent = "Save this plan";
     savePlanButton.removeAttribute("aria-busy");
     setForecastActionsEnabled(hasCurrentForecast());
   }
