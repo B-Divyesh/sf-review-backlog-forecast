@@ -1,7 +1,8 @@
 # Polish 5 — cumulative zero-finding repair
 
 **Reviewed base:** `0535b6020cbe87c143cf09621bd0dcb90004c416`
-**Repair commit:** `52e8c770afc455f81719024bbb11559cbfdddc0d`
+**Feature repair commit:** `52e8c770afc455f81719024bbb11559cbfdddc0d`
+**Final deployed commit:** `2be4452`
 **Build:** `1.0.10`
 **Demo URLs:** <https://review-backlog-forecast.sociobot.in/demo/> and <https://review-backlog-forecast.sociobot.in/?demo=1>
 
@@ -69,12 +70,13 @@ The original warm-paper, enamel, brass, and vermilion recovery-console system re
 
 ## Live evidence
 
-- Deployed `dist/` from repair commit `52e8c770afc455f81719024bbb11559cbfdddc0d` with `swa deploy ./dist --env production --app-name sf-review-backlog-forecast --resource-group sociobot`.
+- Deployed `dist/` from final deployed commit `2be4452` with `swa deploy ./dist --env production --app-name sf-review-backlog-forecast --resource-group sociobot`.
 - Cold <https://review-backlog-forecast.sociobot.in/demo/> verifier passed in 780 ms with no console errors, `lang=en`, one h1, a main landmark, image alt text, and named buttons: `.factory/evidence/polish-5/live/verify.json`.
 - Raw live `/demo/` head has the demo title, description, canonical, Open Graph URL, and Twitter title; both `/demo/` and `/?demo=1` returned HTTP 200.
 - Live functional check: `.factory/evidence/polish-5/live/live-check.json`. It records the persistent banner, 320-card reset, `Save this plan`, formula/rest-day/scheduler wording, same-origin requests, root/Privacy/Terms/Back focus and announcements, the offline How it works link, HTTP 404, and 390 px no-overflow layout.
 - Screenshots: `.factory/evidence/polish-5/live/demo-desktop.png` and `.factory/evidence/polish-5/live/demo-mobile.png`.
 - Live standalone Axe: `.factory/evidence/polish-5/live/axe-cli.json` — 0 violations.
 - Live mobile Lighthouse: `.factory/evidence/polish-5/live/lighthouse.json` — Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 0.9 s, LCP 1.3 s, TBT 50 ms, CLS 0.004.
+- Final cold recheck: `.factory/evidence/polish-5/live-final/verify.json`; the deployed Terms split and demo raw title/canonical/Open Graph URL were confirmed.
 
 No finding of any severity remains.

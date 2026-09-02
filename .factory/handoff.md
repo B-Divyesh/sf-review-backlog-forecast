@@ -1,6 +1,7 @@
 # Review 5 handoff — PASS
 
-**Repair commit:** `52e8c770afc455f81719024bbb11559cbfdddc0d`
+**Feature repair commit:** `52e8c770afc455f81719024bbb11559cbfdddc0d`
+**Final deployed commit:** `2be4452`
 **Build:** `1.0.10`
 **Production demo:** <https://review-backlog-forecast.sociobot.in/demo/>
 **Compatibility demo:** <https://review-backlog-forecast.sociobot.in/?demo=1>
@@ -21,7 +22,7 @@ All cumulative findings from reviews 1–5 are resolved. The product remains a l
 - In that clean clone: `npm test` 23/23, `npm run lint`, `npm run typecheck`, `npm run build`, and `npm run test:e2e` 82/82 all passed.
 - Local verifier and standalone Axe passed with no console errors and 0 Axe violations. Evidence and screenshots: `.factory/evidence/polish-5/local/`.
 - Deployed with `swa deploy ./dist --env production --app-name sf-review-backlog-forecast --resource-group sociobot`.
-- Cold live verification passed: `.factory/evidence/polish-5/live/verify.json`, `live-check.json`, live desktop/mobile screenshots, and `axe-cli.json`. The live check confirms static demo metadata, demo reset, compatibility URL, same-origin requests, focus/Back, offline navigation, mobile width, and HTTP 404.
+- Cold live verification passed: `.factory/evidence/polish-5/live/verify.json`, `live-check.json`, live desktop/mobile screenshots, and `axe-cli.json`. The live check confirms static demo metadata, demo reset, compatibility URL, same-origin requests, focus/Back, offline navigation, mobile width, and HTTP 404. The final deployed Terms copy and demo head were rechecked in `.factory/evidence/polish-5/live-final/verify.json`.
 - Live Lighthouse: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 0.9 s, LCP 1.3 s, TBT 50 ms, CLS 0.004.
 
 ## Run and verify
