@@ -108,3 +108,13 @@ Checked 2026-09-02. The landing, demo, legal routes, and README use no banned ma
 | Expected non-overdue work | regular reviews |
 
 The terminology regression test reads landing, README, legal pages, manifest, and visitor-facing runtime copy. It rejects the retired phrases `Usual daily due`, `estimated normal reviews`, `regular-review rollover`, `daily-due estimate`, `spaced-repetition backlog`, and `FSRS changes`.
+
+## Terms sentence changes
+
+| Words | Sentence |
+| ---: | --- |
+| 15 | The forecast does not model answer ratings, lapses, retention, learning steps, or future scheduler changes. |
+| 12 | It also excludes buried cards, suspended cards, timezone changes, and collection settings. |
+| 4 | Actual queues will differ. |
+| 20 | To the maximum extent allowed by law, the authors are not liable for lost study progress or collection changes. |
+| 9 | They are not liable for indirect damages from use. |

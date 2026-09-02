@@ -53,7 +53,7 @@ The original warm-paper, enamel, brass, and vermilion recovery-console system re
 | F-5-2 | Registered `rest-day-accrual`; a six-day week proves rest-day regular work is added but not reviewed. | `npm test -- -t @claim:rest-day-accrual` |
 | F-5-3 | Generated a real static `/demo/` document with demo-specific title, description, canonical, Open Graph, Twitter, sitemap, and primary links. | Raw-head assertions in `publishes route metadata, shared chrome, and build identity` |
 | F-5-4 | Renamed the local save action to `Save this plan`. | `ships a static demo document and names the save action by its result` |
-| F-5-5 | Replaced `FSRS changes` with `scheduler changes`; the terms now use the same plain wording. | `.factory/copy-audit.md`; terminology regression |
+| F-5-5 | Replaced `FSRS changes` with `scheduler changes`; the Terms page uses the same plain wording and splits long legal sentences. | `.factory/copy-audit.md`; terminology regression |
 | F-5-6 | Split README privacy copy into the two plain result sentences requested. | `keeps release documentation in plain words` |
 | F-5-7 | Replaced metadata/layout-shift implementation terms with page-details/content-movement wording. | `keeps release documentation in plain words` |
 | F-5-8 | Route status now announces `Page loaded: …` and tests root, Privacy, Terms, and Back exactly. | `moves focus to each route heading and announces root, legal pages, and Back` |

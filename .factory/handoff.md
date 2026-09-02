@@ -11,7 +11,7 @@ All cumulative findings from reviews 1–5 are resolved. The product remains a l
 
 - Added a real static `/demo/` document with demo-specific raw title, description, canonical, Open Graph, Twitter metadata, and sitemap entry. `?demo=1` still opens the same isolated demo database, banner, Reset demo control, and Start for real path.
 - Registered and tested the forecast-minute formula and rest-day regular-review accrual in `.factory/claims.json`.
-- Renamed the selected-plan action to `Save this plan` and replaced remaining unexplained scheduler, image-service, and test-copy jargon.
+- Renamed the selected-plan action to `Save this plan` and replaced remaining unexplained scheduler, image-service, and test-copy jargon. Split the remaining long Terms sentences.
 - Fixed route announcement grammar and added root, Privacy, Terms, and Back focus/announcement checks.
 - Restored the How it works header link on the offline page.
 
