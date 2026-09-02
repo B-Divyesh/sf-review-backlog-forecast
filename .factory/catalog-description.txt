@@ -1,1 +1,1 @@
-Plan daily cards and minutes for an overdue Anki queue.
+Plan a daily review schedule for an overdue Anki queue.
