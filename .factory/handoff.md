@@ -1,132 +1,35 @@
-# Review 4 handoff — FAIL
+# Polish 4 handoff — PASS
 
-## What was done
+## Outcome
 
-Completed the mandated adversarial first-read review without changing product
-code. Added `.factory/review-4.md` and checked the deployed product in fresh
-390 × 844 mobile and 1440 × 900 desktop browser contexts.
+All findings from reviews 1–4 are resolved in deployed build `1.0.8`. The round-4 repair commit is `6eddcaef297c1b2e2e8fd628d324923674436674`. Production is <https://review-backlog-forecast.sociobot.in/?demo=1&v=1.0.8>.
+
+Review 4's two remaining README phrases now use plain words. Regression coverage rejects both retired phrases. The catalog description is the verb-first 55-character line `Plan daily cards and minutes for an overdue Anki queue.` The app's mid-century instrument-panel identity and static offline-PWA architecture are unchanged.
 
 ## Verification
 
-- Cold landing and one-click demo were clear and functional. The populated
-  sample, demo banner, Reset demo, and Start for real controls appeared
-  immediately after the one-click entry.
-- From a clean checkout, `npm ci`, `npm test` (19/19), lint, typecheck, build,
-  and `npm run test:e2e` (78/78) passed. The full browser suite executed every
-  registered browser-claim assertion in desktop and mobile; all seven tagged
-  unit claims passed.
-- Live routing, titles, metadata, 404, links, focus handoff, visual identity,
-  request behavior, privacy coverage, and demo isolation were checked. No
-  product-code issue was found.
-
-## Left to do
-
-The review verdict is **FAIL** because two minor README plain-language findings
-remain: replace `PWA/service-worker behavior` with `offline behavior`, and
-replace `generated-image provenance` with `image source record`. See
-`.factory/review-4.md` for exact locations and rewrites.
-
----
-
-# Verification 11 handoff — PASS
-
-## Status
-
-**PASS — release candidate `fdfe4b7f92ff42f9488f3914a64df99b9d737f20` is accepted.**
-
-Verified on 2026-09-02 UTC at
-<https://review-backlog-forecast.sociobot.in/?demo=1>. The live deployment's
-`index.html` SHA-256 exactly matches a fresh candidate production build:
-`d5d85db14491951215270d7f5fd670c3958405cd615b979fe4eaea75a4ed3875`.
-
-## Verification summary
-
-- First-read and one-click demo gate: PASS.
-- Every exact registered claim command: PASS (26/26).
-- `npm ci`: PASS (0 vulnerabilities); `npm test`: PASS (19/19).
-- Lint, typecheck, and exact production build: PASS; `dist/` produced.
-- Full `npm run test:e2e`: PASS (78/78), including axe, desktop/390px mobile,
-  errors, keyboard/focus, input recovery, PWA offline reload, and SW update.
-- Live desktop/mobile demo: PASS; no console/page errors, no serious/critical
-  axe findings, no horizontal mobile overflow, and reduced motion respected.
-- Privacy: PASS; observed requests are same-origin only. No Anki, account,
-  billing, payment, tracking, third-party fonts, or external runtime assets.
-- Headers/caching: PASS; CSP, HSTS, nosniff, referrer, frame, and permissions
-  protections present; immutable hashed assets, no-cache service worker, styled
-  HTTP 404.
-- Size budgets: PASS; initial app JS 7,857 B gzip; app CSS 5,964 B gzip.
-
-No product code was modified by verification. Full evidence and the Lighthouse
-runner limitation are in [verification-11.md](verification-11.md).
-
-## Re-run
-
-```sh
-npm ci
-npm test
-npm run lint
-npm run typecheck
-npm run build
-npm run test:e2e
-mkdir -p /tmp/review-backlog-forecast-verify-11
-/opt/fleet/lib/verify-url.sh 'https://review-backlog-forecast.sociobot.in/?demo=1' /tmp/review-backlog-forecast-verify-11
-```
-
-## Known gaps and next steps
-
-No release-blocking product gap remains. The tool intentionally forecasts counts
-and never edits an Anki collection; that is the researched boundary, not
-unfinished work. The verification container's supplied headless shell crashed
-when Lighthouse attempted to use it, so this report does not claim a fresh
-Lighthouse score; bundle, a11y, PWA, privacy, and live checks passed.
-
----
-
-## Superseded repair record
-
-## Release
-
-- Product: Review Backlog Forecast (`pwa-offline`)
-- Repaired verifier candidate: `4574f59218d14351bd37fdb4e1a9ae9de3344d1c`
-- Verifier report commit: `4450f02462f3052106cd2ad8effcdc5f0412a54b`
-- Repair commits: `aacb87a` and `fdfe4b7`
-- App version: `1.0.7`
-- Production: <https://review-backlog-forecast.sociobot.in/>
-- Deployment target: Static Web App `sf-review-backlog-forecast` in resource group `sociobot`
-
-## Repairs
-
-1. Reproduced the reported `#8E2D1D` focus ring at 1.41:1 against `#173F3A` enamel on every listed dark-surface control.
-2. Added context-specific focus colors. Focus gold is 7.60:1 against enamel and 3.12:1 against the vermilion action. The import control uses aged brass at 3.26:1 against enamel and 3.36:1 against cream.
-3. Added a browser regression that measures focus contrast on the demo banner, planner, saved-plan strip, and visible import control on desktop and 390 px mobile.
-4. Moved the visually hidden file input inside its visible label so keyboard focus is drawn on the import control.
-5. Registered and proved installability, no transmission of counts/imported file data/assumptions/saved plans, and saved-plan offline reopening. `.factory/claims.json` now has 26 unique claims and each tag occurs exactly once.
-6. Bumped the manifest, service-worker cache, and visible build identity to `1.0.7`; the update regression now exercises `1.0.7` to `1.0.8`.
-7. During the required 200% text check, found and fixed mobile overflow from the header and an unbroken CSV field name. A 390 px/200% regression now keeps document width at 390 px with the forecast controls available.
-
-The researched brief, deterministic forecast behavior, demo isolation, local data model, imports, exports, and visual direction are unchanged.
-
-## Verification evidence
-
-Final checks ran from a clean `npm ci` install on 2026-09-01 UTC:
-
-- `npm ci`: PASS; 143 packages, 0 vulnerabilities.
-- `npm test`: PASS; 19/19 unit and release tests.
+- Clean remote clone: `/tmp/rbf-polish4-clean-rdcg65` at `6eddcae`.
+- `npm ci`: PASS, 143 packages, 0 vulnerabilities.
+- Every exact `.factory/claims.json` command: PASS, 26/26.
+- `npm test`: PASS, 20/20.
 - `npm run lint`: PASS.
 - `npm run typecheck`: PASS.
-- `npm run build`: PASS; `dist/` contains the static PWA.
-- `npm run test:e2e`: PASS; 78/78 checks across desktop Chromium and 390 × 844 mobile.
-- Every exact command in `.factory/claims.json`: PASS; 26/26 claims.
-- Axe through the Playwright integration: zero serious or critical findings on Demo, Privacy, Terms, and 404 at desktop and mobile sizes.
-- `/opt/fleet/lib/verify-url.sh` against the live demo: PASS in 593 ms; no console errors, `lang=en`, one `h1`, one `main`, no missing alt text, and no unnamed buttons.
-- Manual live mobile check: minimum dark-surface focus contrast 3.12:1; 200% text size remains 390 px wide; no console errors.
-- Live PWA check: zero Chromium installability errors; Gentle plan restored offline as `Gentle · 320 overdue · 30-minute cap`; offline status appeared; observed requests were same-origin GETs with no request body.
-- Live artifact identity: 28/28 publicly served build files match local `dist/` by SHA-256.
-- Live response policy: HTML 200 with CSP, HSTS, `nosniff`, strict referrer policy, permissions policy, and frame denial. HTML revalidates after 30 seconds; hashed assets are immutable for one year; service worker is `no-cache`.
-- Live mobile Lighthouse: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 0.9 s, LCP 1.3 s, TBT 0 ms, CLS 0.004, Speed Index 0.9 s. Lighthouse wrote a complete JSON report before its headless tab printed a teardown crash message.
-- Final bundles: app JavaScript 20,564 bytes raw / 7,868 gzip; route focus 1,046 / 589; demo bootstrap 759 / 382; app CSS 24,814 / 5,956; mobile hero 26,300 bytes. All budgets pass.
+- `npm run build`: PASS; `dist/index.html` exists.
+- `npm run test:e2e`: PASS, 78/78 across desktop and 390 × 844 mobile.
+- Standalone Axe CLI: PASS, zero violations on the live demo.
+- Live Playwright Axe: PASS, zero violations on Demo, Privacy, Terms, and 404 in both viewports.
+- Live cold verifier: PASS in 853 ms with no console errors, correct title/lang, one h1, main landmark, alt text, and named buttons.
+- Live routing: PASS for route titles, heading focus, Back focus, legal links, and styled HTTP 404.
+- Live demo: PASS for first-viewport results, persistent banner, Reset demo, Start for real, and separate real/demo databases.
+- Live privacy/offline: PASS for same-origin-only requests, no page errors, saved-plan reload, and forecast plus saved-plan offline reopening.
+- Live mobile: PASS at 390 px and 200% text size with no page overflow.
+- Live artifact: local and deployed `index.html` SHA-256 both `4d39ce2dcc70c8524c11f5be538a151fe2219fb5af5af4d6cd7060920d1ffb45`.
+- Fresh mobile Lighthouse: Performance 100, Accessibility 100, Best Practices 100, SEO 100; LCP 1.1 s, TBT 0 ms, CLS 0.004.
+- Bundles: app JavaScript 20,564 bytes raw / 7.87 kB gzip; app CSS 24,814 bytes raw / 5.96 kB gzip.
 
-## Re-run
+Detailed finding-by-finding evidence is in `.factory/polish-4.md`. Runtime evidence is under `.factory/evidence/polish-4/`.
+
+## Run and verify
 
 ```sh
 npm ci
@@ -135,12 +38,10 @@ npm run lint
 npm run typecheck
 npm run build
 npm run test:e2e
-mkdir -p /tmp/review-backlog-forecast-verify
-/opt/fleet/lib/verify-url.sh 'https://review-backlog-forecast.sociobot.in/?demo=1' /tmp/review-backlog-forecast-verify
 ```
 
-Run any individual public promise with the exact command in `.factory/claims.json`.
+Run individual public promises with the exact commands in `.factory/claims.json`.
 
 ## Known gaps and next steps
 
-No release-blocking product gap remains. The tool intentionally forecasts counts and never edits an Anki collection; that is a researched product boundary, not unfinished work. No backend, account, payment, shared database, or AI service is used.
+None. The product intentionally forecasts counts and never modifies an Anki collection; this is the researched product boundary.
