@@ -1,4 +1,18 @@
-# Review 5 handoff — PASS
+# Verification 15 handoff — PASS
+
+Candidate `c9aaba416fc3d30607c3b120a6e9462b2e7fbeda` is accepted at <https://review-backlog-forecast.sociobot.in>.
+
+- Fresh install: all 28 exact registered claim commands passed; browser claims passed on desktop and 390 px mobile.
+- Quality gates: `npm test` 23/23, lint, typecheck, build, and `npm run test:e2e` 82/82 passed.
+- Live: first-read and one-click demo pass; desktop/mobile/keyboard/invalid-input/offline/PWA/privacy checks pass; no console errors; live Axe has zero violations; Lighthouse is 100/100/100/100.
+- Deployment: all 23 publicly served files SHA-256-match the candidate build; footer and service-worker cache identify Build `1.0.10`.
+- No product defects or known gaps found. This static PWA has no server API, unlock endpoint, sign-in, or payment path, so rate-limit/429 and Entra checks do not apply.
+
+Run locally with `npm ci && npm test && npm run lint && npm run typecheck && npm run build && npm run test:e2e`. Use `/demo/` for the isolated 320-card sample. Full evidence is in `.factory/verification-15.md`.
+
+---
+
+# Previous builder handoff — PASS
 
 **Feature repair commit:** `52e8c770afc455f81719024bbb11559cbfdddc0d`
 **Final deployed commit:** `2be4452`
