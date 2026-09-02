@@ -1,1 +1,1 @@
-Plan capped recovery sessions for an overdue queue.
+Plan daily cards and minutes for an overdue Anki queue.

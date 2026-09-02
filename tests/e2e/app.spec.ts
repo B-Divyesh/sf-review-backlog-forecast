@@ -727,7 +727,7 @@ test("publishes route metadata, shared legal chrome, and build identity", async 
     await page.goto(route);
     await expect(page.getByRole("banner").getByRole("link", { name: "Review Backlog Forecast home" })).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
-    await expect(page.getByRole("contentinfo")).toContainText("Built by Param Factory · Build 1.0.7");
+    await expect(page.getByRole("contentinfo")).toContainText("Built by Param Factory · Build 1.0.8");
   }
   for (const [route, title, canonical] of [
     ["/", "Review Backlog Forecast — Plan an overdue queue", "https://review-backlog-forecast.sociobot.in/"],
@@ -787,7 +787,7 @@ test("activates a waiting service-worker update without losing the demo", async 
   cpSync("dist", fixture, { recursive: true });
   const workerPath = join(fixture, "sw.js");
   const originalWorker = readFileSync(workerPath, "utf8");
-  expect(originalWorker).toContain('const VERSION = "rbf-v1.0.7"');
+  expect(originalWorker).toContain('const VERSION = "rbf-v1.0.8"');
   const server = await startStaticServer(fixture);
   const context = await browser.newContext();
   const page = await context.newPage();
@@ -799,11 +799,11 @@ test("activates a waiting service-worker update without losing the demo", async 
         await new Promise<void>((resolve) => navigator.serviceWorker.addEventListener("controllerchange", () => resolve(), { once: true }));
       }
     });
-    writeFileSync(workerPath, originalWorker.replace("rbf-v1.0.7", "rbf-v1.0.8"));
+    writeFileSync(workerPath, originalWorker.replace("rbf-v1.0.8", "rbf-v1.0.9"));
     await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration())?.update(); });
     await expect(page.getByText("A new version is ready.")).toBeVisible();
     await page.getByRole("button", { name: "Update app" }).click();
-    await page.waitForFunction(async () => (await caches.keys()).includes("rbf-v1.0.8-shell"));
+    await page.waitForFunction(async () => (await caches.keys()).includes("rbf-v1.0.9-shell"));
     await expect(page.getByRole("heading", { name: "Three recovery plans" })).toBeVisible();
   } finally {
     await context.close();

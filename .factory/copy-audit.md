@@ -1,6 +1,6 @@
-# Copy audit — polish 3
+# Copy audit — polish 4
 
-Checked 2026-09-01. The landing, demo, legal routes, and README use no banned marketing terms. Each audited sentence is 22 words or fewer. Product-name occurrences of “Backlog” are retained only as the proper name **Review Backlog Forecast**.
+Checked 2026-09-02. The landing, demo, legal routes, and README use no banned marketing terms. Each audited sentence is 22 words or fewer. Product-name occurrences of “Backlog” are retained only as the proper name **Review Backlog Forecast**.
 
 ## Landing and demo sentences
 
@@ -80,6 +80,19 @@ Checked 2026-09-01. The landing, demo, legal routes, and README use no banned ma
 | 7 | No account or payment step is required. |
 | 12 | Inputs and the last chosen plan stay in this browser’s local database. |
 | 14 | After the first visit, the browser’s offline cache keeps the app available without a connection. |
+| 7 | Open the local URL printed by Vite. |
+| 8 | To test offline behavior, use a production build. |
+| 18 | The exact deploy command is `npm run build`; static output lands in `dist/` with `dist/index.html` at its root. |
+| 11 | `npm run test:e2e` builds the production app before starting Playwright. |
+| 15 | The suite checks desktop and 390px mobile layouts, keyboard use, accessibility, privacy, persistence, and exports. |
+| 15 | It also checks offline reopening, updates, metadata, 404 behavior, touch targets, and startup layout shift. |
+| 13 | Every visitor-facing product claim and its exact test command is listed in `.factory/claims.json`. |
+| 8 | The isolated test data is documented in `.factory/demo.md`. |
+| 7 | See the privacy page and the terms. |
+| 6 | The researched opportunity is in `.factory/brief.json`. |
+| 10 | The visual system and image source record are in `.factory/design.md`. |
+| 1 | MIT. |
+| 2 | See `LICENSE`. |
 
 ## Terminology table
 

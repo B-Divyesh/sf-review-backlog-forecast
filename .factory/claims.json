@@ -1,7 +1,7 @@
 [
   {
     "id": "three-policies",
-    "claim": "Compares distinct Steady, Deadline, and Gentle recovery policies",
+    "claim": "Compares distinct Steady, Deadline, and Gentle recovery plans",
     "where": "Landing page, forecast results, and README",
     "test": "npm test -- -t @claim:three-policies",
     "sandbox": "The sample is simulated under all three policies and their schedules are compared."

@@ -64,4 +64,14 @@ describe("release contract", () => {
       "spaced-repetition backlog"
     ]) expect(visitorCopy).not.toContain(retiredCopy);
   });
+
+  it("keeps release documentation in plain words", () => {
+    const readme = readFileSync("README.md", "utf8");
+    const catalog = readFileSync(".factory/catalog-description.txt", "utf8").trim();
+    expect(readme).toContain("To test offline behavior, use a production build:");
+    expect(readme).toContain("The visual system and image source record are in `.factory/design.md`.");
+    expect(readme).not.toMatch(/PWA\/service-worker behavior|generated-image provenance/);
+    expect(catalog.length).toBeLessThanOrEqual(120);
+    expect(catalog).toMatch(/^(Plan|Compare)\b/);
+  });
 });

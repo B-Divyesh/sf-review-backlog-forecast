@@ -40,7 +40,7 @@ npm ci
 npm run dev
 ```
 
-Open the local URL printed by Vite. For PWA/service-worker behavior, use a production build:
+Open the local URL printed by Vite. To test offline behavior, use a production build:
 
 ```sh
 npm run build
@@ -64,7 +64,7 @@ npm run test:e2e
 
 Vite and TypeScript produce an installable offline web app. It loads no third-party fonts, scripts, analytics, advertising, or runtime image service. No account or payment step is required. Inputs and the last chosen plan stay in this browser’s local database. After the first visit, the browser’s offline cache keeps the app available without a connection. See [the privacy page](https://review-backlog-forecast.sociobot.in/privacy/) and [the terms](https://review-backlog-forecast.sociobot.in/terms/).
 
-The researched opportunity lives in `.factory/brief.json`; the product-specific visual system and generated-image provenance live in `.factory/design.md`.
+The researched opportunity is in `.factory/brief.json`. The visual system and image source record are in `.factory/design.md`.
 
 ## License
 
