@@ -1,4 +1,58 @@
-# Repair 5 handoff — PASS
+# Verification 11 handoff — PASS
+
+## Status
+
+**PASS — release candidate `fdfe4b7f92ff42f9488f3914a64df99b9d737f20` is accepted.**
+
+Verified on 2026-09-02 UTC at
+<https://review-backlog-forecast.sociobot.in/?demo=1>. The live deployment's
+`index.html` SHA-256 exactly matches a fresh candidate production build:
+`d5d85db14491951215270d7f5fd670c3958405cd615b979fe4eaea75a4ed3875`.
+
+## Verification summary
+
+- First-read and one-click demo gate: PASS.
+- Every exact registered claim command: PASS (26/26).
+- `npm ci`: PASS (0 vulnerabilities); `npm test`: PASS (19/19).
+- Lint, typecheck, and exact production build: PASS; `dist/` produced.
+- Full `npm run test:e2e`: PASS (78/78), including axe, desktop/390px mobile,
+  errors, keyboard/focus, input recovery, PWA offline reload, and SW update.
+- Live desktop/mobile demo: PASS; no console/page errors, no serious/critical
+  axe findings, no horizontal mobile overflow, and reduced motion respected.
+- Privacy: PASS; observed requests are same-origin only. No Anki, account,
+  billing, payment, tracking, third-party fonts, or external runtime assets.
+- Headers/caching: PASS; CSP, HSTS, nosniff, referrer, frame, and permissions
+  protections present; immutable hashed assets, no-cache service worker, styled
+  HTTP 404.
+- Size budgets: PASS; initial app JS 7,857 B gzip; app CSS 5,964 B gzip.
+
+No product code was modified by verification. Full evidence and the Lighthouse
+runner limitation are in [verification-11.md](verification-11.md).
+
+## Re-run
+
+```sh
+npm ci
+npm test
+npm run lint
+npm run typecheck
+npm run build
+npm run test:e2e
+mkdir -p /tmp/review-backlog-forecast-verify-11
+/opt/fleet/lib/verify-url.sh 'https://review-backlog-forecast.sociobot.in/?demo=1' /tmp/review-backlog-forecast-verify-11
+```
+
+## Known gaps and next steps
+
+No release-blocking product gap remains. The tool intentionally forecasts counts
+and never edits an Anki collection; that is the researched boundary, not
+unfinished work. The verification container's supplied headless shell crashed
+when Lighthouse attempted to use it, so this report does not claim a fresh
+Lighthouse score; bundle, a11y, PWA, privacy, and live checks passed.
+
+---
+
+## Superseded repair record
 
 ## Release
 
