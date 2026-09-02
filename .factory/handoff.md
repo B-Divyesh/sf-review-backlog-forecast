@@ -1,20 +1,30 @@
-# Review 5 handoff — FAIL
+# Review 5 handoff — PASS
 
-Reviewed commit `0535b6020cbe87c143cf09621bd0dcb90004c416` and the live product at
-<https://review-backlog-forecast.sociobot.in/>. No product code was changed.
+**Repair commit:** `52e8c770afc455f81719024bbb11559cbfdddc0d`
+**Build:** `1.0.10`
+**Production demo:** <https://review-backlog-forecast.sociobot.in/demo/>
+**Compatibility demo:** <https://review-backlog-forecast.sociobot.in/?demo=1>
 
-The cold mobile and desktop first screens are clear, and the one-click demo,
-Reset, real/demo storage isolation, same-origin privacy behavior, and offline
-reload work. All 26 exact claim commands passed from a fresh clone. Full gates
-also passed: 20/20 unit tests, lint, typecheck, build, and 80/80 Playwright
-tests. The live URL verifier passed, and Axe reported zero violations.
+All cumulative findings from reviews 1–5 are resolved. The product remains a local-first, static PWA with its original mid-century recovery-console visual system.
 
-The verdict remains FAIL because `.factory/review-5.md` records nine minor
-findings: two unlisted forecast assumptions, incorrect static metadata for the
-demo route, one non-result-naming save action, three plain-language issues, an
-ungrammatical route announcement, and inconsistent offline navigation.
+## Delivered
 
-To verify again:
+- Added a real static `/demo/` document with demo-specific raw title, description, canonical, Open Graph, Twitter metadata, and sitemap entry. `?demo=1` still opens the same isolated demo database, banner, Reset demo control, and Start for real path.
+- Registered and tested the forecast-minute formula and rest-day regular-review accrual in `.factory/claims.json`.
+- Renamed the selected-plan action to `Save this plan` and replaced remaining unexplained scheduler, image-service, and test-copy jargon.
+- Fixed route announcement grammar and added root, Privacy, Terms, and Back focus/announcement checks.
+- Restored the How it works header link on the offline page.
+
+## Verification
+
+- Fresh remote clone `/tmp/rbf-polish5-clean-5QRwK9` at `52e8c770…`: `npm ci` reported zero vulnerabilities; every exact command in `.factory/claims.json` passed separately (28/28). Evidence: `.factory/evidence/polish-5/clean-claim-commands.log`.
+- In that clean clone: `npm test` 23/23, `npm run lint`, `npm run typecheck`, `npm run build`, and `npm run test:e2e` 82/82 all passed.
+- Local verifier and standalone Axe passed with no console errors and 0 Axe violations. Evidence and screenshots: `.factory/evidence/polish-5/local/`.
+- Deployed with `swa deploy ./dist --env production --app-name sf-review-backlog-forecast --resource-group sociobot`.
+- Cold live verification passed: `.factory/evidence/polish-5/live/verify.json`, `live-check.json`, live desktop/mobile screenshots, and `axe-cli.json`. The live check confirms static demo metadata, demo reset, compatibility URL, same-origin requests, focus/Back, offline navigation, mobile width, and HTTP 404.
+- Live Lighthouse: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 0.9 s, LCP 1.3 s, TBT 50 ms, CLS 0.004.
+
+## Run and verify
 
 ```sh
 npm ci
@@ -25,4 +35,8 @@ npm run build
 npm run test:e2e
 ```
 
-Known product gaps are exactly the findings in `.factory/review-5.md`.
+For the sample, open `/demo/` or `/?demo=1`. See `.factory/polish-5.md` for every finding-to-evidence mapping.
+
+## Known gaps
+
+None.
